@@ -4,13 +4,13 @@ var hexWidth = 82;
 var hexHeight = 71;
 var hexes = new Array(300);
 
-// gets a random int from 0 to max - 1.
+// Gets a random int from 0 to max - 1.
 function getRandomInt(max) {
     return Math.floor(Math.random() * Math.floor(max));
 }
 
 const drawBoard = function() {
-    // grabs canvas elements from the HTML
+    // Grabs canvas elements from the HTML
     var boardCanvas = document.getElementById("boardCanvas");
     var boardCtx = boardCanvas.getContext("2d");
 
@@ -28,7 +28,7 @@ const drawBoard = function() {
     var windowWidth = 1920;
     var windowHeight = 1000;
 
-    // sets the cancas size. dynamic resizing not currently supported.
+    // Sets the cancas size. dynamic resizing not currently supported.
     function setCanvasSize() {
         boardCanvas.width = windowWidth;
         boardCanvas.height = windowHeight;
@@ -40,30 +40,24 @@ const drawBoard = function() {
         canvasH = boardCanvas.height;
     }
 
-    // determines the number of hexes to draw based on hex size and canvas width/height
+    // Determines the number of hexes to draw based on hex size and canvas width/height
     function setNumHexes(W, H) {
         hexesPerRow = Math.floor(windowWidth / (W * 1.5) + 1);
         numHexes = ((Math.floor(windowHeight / (H * 2)) * 2) + 1) * hexesPerRow;
-        // console.log(numHexes);
     }
 
     setCanvasSize();
-    setNumHexes(hexWidth, hexHeight)
+    setNumHexes(hexWidth, hexHeight);
 
     var mousePosX = -1;
     var mousePosY = -1;
     var hexesPos = new Array(numHexes * 2);
     var canvasBounds = boardCanvas.getBoundingClientRect();
-    var colors = new Array(numHexes * 3);
-    var colorsList = ['red', 'orange', 'green', 'blue',
-                'pink','purple', 'yellow', 'blue',
-                'pink', 'red', 'green', 'blue', 'pink',
-                'orange', 'yellow', 'purple', 'grey'];
 
-
-        // draws an outline around a hex with the specified starting point (top left) and color
+    // Draws an outline around a single hex with the specified starting point (top left) and color
     function drawOutlineOrigin(originX, originY, color, stroke, count) {
-        let m2x, m2y, x0, y0, x1, y1, x2, y2, x3, y3, x4, y4
+        let m2x, m2y, x0, y0, x1, y1, x2, y2, x3, y3, x4, y4;
+
         m2x = originX;
         m2y = originY + hexHeight / 2;
         x0 = originX + hexWidth / 4;
@@ -77,12 +71,13 @@ const drawBoard = function() {
         x4 = x0;
         y4 = y3;
 
+        // Adds points to array to facilitate hex hitboxes.
         hexesPos[count] = [m2x, m2y, x0, y0, x1, y1, x2, y2, x3, y3, x4, y4];
 
         drawOutline(m2x, m2y, x0, y0, x1, y1, x2, y2, x3, y3, x4, y4, color, stroke);
     }
 
-    // draws an outline around a hex with the specified dimensions and color
+    // Draws an outline around a hex with the specified dimensions and color
     function drawOutline(m2x, m2y, x0, y0, x1, y1, x2, y2, x3, y3, x4, y4, color, stroke) {
         boardCtx.beginPath();
         boardCtx.moveTo(m2x, m2y);
@@ -100,11 +95,11 @@ const drawBoard = function() {
 
     const numHexTypes = 7;
     var hexImgArray = new Array(numHexTypes);
-
     function loadImgHexes() {
         for (i = 0; i < numHexTypes; i++) {
             hexImgArray[i] = new Image();
         }
+
         hexImgArray[0].src = "image_sources/ironOre.png";
         hexImgArray[1].src = "image_sources/jewels.png";
         hexImgArray[2].src = "image_sources/leather.png";
@@ -130,13 +125,14 @@ const drawBoard = function() {
             posX += 123;
         }
         return i;
-        // hexes[i] = [m2x, m2y, x0, y0, x1, y1, x2, y2, x3, y3, x4, y4];
     }
 
     // W = 82, H = 71
-    function drawImgHexes() {
+    // (This board is drawn manually)
+    function drawImgHexes(posX, posY) {
         hexImgArray[numHexTypes - 1].onload = function() {
-            let posX = 225, posY = 106, count = 0;
+
+            let count = 0;
             posX += 82;
             count += drawLineOfHexes(posX, posY, 5, count);
             
@@ -210,51 +206,39 @@ const drawBoard = function() {
         }
     }
 
-    // draws the bottom menu where game options would be
+    // Draws the bottom menu where game options would be
     function drawMenu() {
         menuCtx.fillStyle = 'grey';
         menuCtx.fillRect(0, windowHeight - 120, boardCanvas.width, 120);
     }
 
-    // draws the top part of the menu where game statistics would be.
+    // Draws the top part of the menu where game statistics would be.
     function drawStats() {
         statCtx.fillStyle = 'grey';
         statCtx.fillRect(0, 0, boardCanvas.width, 35);
     }
 
-    // this is really only for testing purposes.
-    function setColors() {
-        let i;
-        for (i = 0; i < numHexes * 3; i++) {
-            colors[i] = colorsList[getRandomInt(11)];
-        }
-    }
-
-    // drawBoard();
-    // drawHex();
-    // setColors();
-    // drawHexes(numHexes, hexWidth, hexHeight, 0, 0);
     drawStats();
     drawMenu();
     loadImgHexes();
-    drawImgHexes();
+    drawImgHexes(225, 106);
 
     // document.addEventListener("mousemove", mouseHandlerHex, false);
     document.addEventListener("click", mouseHandlerHex, false);
     window.addEventListener("scroll", scrollHandler, false);
 
-    // gets canvas bounds on scroll
+    // Gets canvas bounds on scroll
     function scrollHandler(e) {
         bounds = canvas.getBoundingClientRect();
         canvasBounds = boardCanvas.getBoundingClientRect();
     }
 
-    // calculates slope for hitbox detection
+    // Calculates slope for hitbox detection
     function slope(x0, y0, x1, y1) {
         return (y1 - y0) / (x1 - x0);
     }
 
-    // part of hitbox calculation
+    // Part of hitbox calculation
     function intercept(x, y, m) {
         return y - (m * x);
     }
@@ -263,11 +247,20 @@ const drawBoard = function() {
     function mouseHandlerHex(e) {
         mousePosX = e.clientX - canvasBounds.left;
         mousePosY = e.clientY - canvasBounds.top;
-        var i = 0, isClicked = false, hbound = false, vboundCheck = false, hboundCheck = false;
-        var m , b;
+
+        let i = 0;
+        let isClicked = false;
+        let hbound = false;
+        let vboundCheck = false;
+        let hboundCheck = false;
+
+        // m holds slope and b holds the intercept
+        var m, b;
+
         if (mousePosY < 26 || mousePosY > windowHeight - 120) {
             return;
         }
+
         for (i = 0; i < numHexes * 3; i++) {
             if (mousePosY > hexesPos[i][3] && mousePosY < hexesPos[i][11]) {
                 if (mousePosX > hexesPos[i][2]) {
@@ -309,22 +302,23 @@ const drawBoard = function() {
                 }
 
                 if (isClicked) {
-                    // colors[i] = colorsList[getRandomInt(11)];
-                    // drawHexes(numHexes, hexWidth, hexHeight, 0, 0);
                     console.log("This is hex #" + i + ".");
                     console.log("Econ score: " + hexes[i].getEconScore())
                     console.log("Resource given: " + hexes[i].getResource());
-                    console.log("\n");
                     player[0].addTerritory(i);
                     console.log(player[0].getHexesControlled());
+                    console.log("\n");
                 }
             }
+            
             isClicked = false;
         }
     }
 }
 
 /*
+Keeping this here for now to show how specific hex values are calculated.
+
 // draws the hexes via the canvas. will be replaced by images.
     // (changing the start point is bugged)
     function drawHexes(numHexes, hexSizeW, hexSizeH, startPointX, startPointY) {

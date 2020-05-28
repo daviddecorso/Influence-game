@@ -2,9 +2,17 @@ function Player() {
     var ip, ep, mp;
     let hexesControlled = [];
     var name = "player";
+
+    // Influence points
     ip = 0;
+
+    // Economy points
     ep = 0;
+
+    // Military points
     mp = 0;
+
+    // Political points
     pp = 0;
 
     this.getIp = function() {
