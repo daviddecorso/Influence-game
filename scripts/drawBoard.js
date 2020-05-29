@@ -3,6 +3,7 @@ var hexesPerRow;
 var hexWidth = 82;
 var hexHeight = 71;
 var hexes = new Array(300);
+var initializedHexes = false;
 
 // Gets a random int from 0 to max - 1.
 function getRandomInt(max) {
@@ -109,19 +110,28 @@ const drawBoard = function() {
         hexImgArray[6].src = "image_sources/grass.png";
     }
 
+    
     function drawLineOfHexes(posX, posY, num, count) {
         let i = 0, hexTypeToDraw = 0, randNum;
+        
         for (i = 0; i < hexesPerRow - num; i++) {
-            randNum = getRandomInt(31);
-            if (randNum > 5) {
-                hexTypeToDraw = 6;
+            if (!initializedHexes) {
+                randNum = getRandomInt(31);
+                if (randNum > 5) {
+                    hexTypeToDraw = 6;
+                }
+                else {
+                    hexTypeToDraw = randNum;
+                }
+                hexes[count + i] = new Hex(hexTypeToDraw);
+                
             }
             else {
-                hexTypeToDraw = randNum;
+                hexTypeToDraw = hexes[count + i].getResourceNum();
             }
+            
             boardCtx.drawImage(hexImgArray[hexTypeToDraw], posX, posY);
             drawOutlineOrigin(posX, posY, 'black', 1, count + i);
-            hexes[count + i] = new Hex(hexTypeToDraw);
             posX += 123;
         }
         return i;
@@ -129,81 +139,84 @@ const drawBoard = function() {
 
     // W = 82, H = 71
     // (This board is drawn manually)
-    function drawImgHexes(posX, posY) {
-        hexImgArray[numHexTypes - 1].onload = function() {
+    function drawImgHexes(startPosX, posY) {
+        let posX = startPosX;
+        let count = 0;
 
-            let count = 0;
-            posX += 82;
-            count += drawLineOfHexes(posX, posY, 5, count);
-            
-            posY += 36;
-            posX = 164 + 82;
-            count += drawLineOfHexes(posX, posY, 4, count);
+        boardCtx.clearRect(0, 0, canvasW, canvasH);
 
-            posY += 35;
-            posX = 328 - 20;
-            count += drawLineOfHexes(posX, posY, 4, count);
+        posX += 82;
+        count += drawLineOfHexes(posX, posY, 5, count);
+        
+        posY += 36;
+        posX = startPosX + 21;
+        count += drawLineOfHexes(posX, posY, 4, count);
 
-            posY += 36;
-            posX = 164 + 82;
-            count += drawLineOfHexes(posX, posY, 4, count);
+        posY += 35;
+        posX += 62;
+        count += drawLineOfHexes(posX, posY, 4, count);
 
-            posY += 35;
-            posX = 308 - 123;
-            count += drawLineOfHexes(posX, posY, 3, count);
+        posY += 36;
+        posX = startPosX + 21;
+        count += drawLineOfHexes(posX, posY, 4, count);
 
-            posY += 36;
-            posX = 164 + 82;
-            count += drawLineOfHexes(posX, posY, 4, count);
+        posY += 35;
+        posX = startPosX - 40;
+        count += drawLineOfHexes(posX, posY, 3, count);
 
-            posY += 35;
-            posX = 308 - 123;
-            count += drawLineOfHexes(posX, posY, 3, count);
+        posY += 36;
+        posX = startPosX + 21;
+        count += drawLineOfHexes(posX, posY, 4, count);
 
-            posY += 36;
-            posX = 164 + 82;
-            count += drawLineOfHexes(posX, posY, 4, count);
+        posY += 35;
+        posX = startPosX - 40;
+        count += drawLineOfHexes(posX, posY, 3, count);
 
-            posY += 35;
-            posX = 308 - 123;
-            count += drawLineOfHexes(posX, posY, 4, count);
+        posY += 36;
+        posX = startPosX + 21;
+        count += drawLineOfHexes(posX, posY, 4, count);
 
-            posY += 36;
-            posX = 164 + 82 - 123;
-            count += drawLineOfHexes(posX, posY, 4, count);
+        posY += 35;
+        posX = startPosX - 40;
+        count += drawLineOfHexes(posX, posY, 4, count);
 
-            posY += 35;
-            posX = 308 - 123 - 123;
-            count += drawLineOfHexes(posX, posY, 3, count);
+        posY += 36;
+        posX = startPosX + 21 - 123;
+        count += drawLineOfHexes(posX, posY, 4, count);
 
-            posY += 36;
-            posX = 164 + 82 - 123;
-            count += drawLineOfHexes(posX, posY, 4, count);
+        posY += 35;
+        posX = startPosX - 40 - 123;
+        count += drawLineOfHexes(posX, posY, 3, count);
 
-            posY += 35;
-            posX = 308 - 123 -123;
-            count += drawLineOfHexes(posX, posY, 3, count);
+        posY += 36;
+        posX = startPosX + 21 - 123;
+        count += drawLineOfHexes(posX, posY, 4, count);
 
-            posY += 36;
-            posX = 164 + 82 - 123;
-            count += drawLineOfHexes(posX, posY, 3, count);
+        posY += 35;
+        posX = startPosX - 40 - 123;
+        count += drawLineOfHexes(posX, posY, 3, count);
 
-            posY += 35;
-            posX = 308 - 123;
-            count += drawLineOfHexes(posX, posY, 3, count);
+        posY += 36;
+        posX = startPosX + 21 - 123;
+        count += drawLineOfHexes(posX, posY, 3, count);
 
-            posY += 36;
-            posX = 164 + 82 - 123;
-            count += drawLineOfHexes(posX, posY, 3, count);
+        posY += 35;
+        posX = startPosX - 40;
+        count += drawLineOfHexes(posX, posY, 3, count);
 
-            posY += 35;
-            posX = 308 - 123;
-            count += drawLineOfHexes(posX, posY, 3, count);
+        posY += 36;
+        posX = startPosX + 21 - 123;
+        count += drawLineOfHexes(posX, posY, 3, count);
 
-            posY += 36;
-            posX = 164 + 82;
-            count += drawLineOfHexes(posX, posY, 3, count);
-        }
+        posY += 35;
+        posX = startPosX - 40;
+        count += drawLineOfHexes(posX, posY, 3, count);
+
+        posY += 36;
+        posX = startPosX + 21;
+        count += drawLineOfHexes(posX, posY, 3, count);
+
+        initializedHexes = true;
     }
 
     // Draws the bottom menu where game options would be
@@ -221,11 +234,50 @@ const drawBoard = function() {
     drawStats();
     drawMenu();
     loadImgHexes();
-    drawImgHexes(225, 106);
+    hexImgArray[numHexTypes - 1].onload = function() {
+        drawImgHexes(225, 106);
+    }
 
-    // document.addEventListener("mousemove", mouseHandlerHex, false);
+    document.addEventListener("mousemove", canvasEdgeScroll, false);
     document.addEventListener("click", mouseHandlerHex, false);
     window.addEventListener("scroll", scrollHandler, false);
+
+    let posXCanvas = 225, posYCanvas = 106;
+    function canvasEdgeScroll (e) {
+        mousePosX = e.clientX;
+        mousePosY = e.clientY;
+
+        if (canvasH > innerHeight) {
+            if (mousePosY < 100) {
+                if (posYCanvas < 106) {
+                    posYCanvas += 5;
+                }
+                drawImgHexes(posXCanvas, posYCanvas);
+            }
+            else if (mousePosY > innerHeight - 100) {
+                if (posYCanvas > - 500) {
+                    posYCanvas -= 5;
+                }
+                drawImgHexes(posXCanvas, posYCanvas);
+            }
+        }
+
+        if (canvasW > innerWidth) {
+            if (mousePosX < 100) {
+                if (posXCanvas < 225) {
+                    posXCanvas += 5;
+                }
+                drawImgHexes(posXCanvas, posYCanvas);
+                
+            }
+            else if (mousePosX > innerWidth - 100){
+                if (posXCanvas > -850) {
+                    posXCanvas -= 5;
+                }
+                drawImgHexes(posXCanvas, posYCanvas);
+            }
+        }
+    }
 
     // Gets canvas bounds on scroll
     function scrollHandler(e) {
