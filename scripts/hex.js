@@ -15,6 +15,7 @@ function randEconScore() {
 function Hex(hexType) {
     var econScore = randEconScore();
     var resourceGiven;
+    var resourceNum = hexType;
     var givesResources = true;
     var movementScore;
     var defensiveScore;
@@ -66,6 +67,9 @@ function Hex(hexType) {
     }
     this.isResourceHex = function() {
         return givesResources;
+    }
+    this.getResourceNum = function() {
+        return resourceNum;
     }
 
 }
