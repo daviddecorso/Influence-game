@@ -111,6 +111,7 @@ const drawBoard = function() {
     }
 
     
+    // Draws a line of hexes on the screen and initializes new hex objects.
     function drawLineOfHexes(posX, posY, num, count) {
         let i = 0, hexTypeToDraw = 0, randNum;
         
@@ -224,12 +225,14 @@ const drawBoard = function() {
 
     // Draws the bottom menu where game options would be
     function drawMenu() {
+        menuCtx.clearRect(0, 0, canvasW, canvasH);
         menuCtx.fillStyle = 'grey';
         menuCtx.fillRect(0, innerHeight - 120, boardCanvas.width, 120);
     }
 
     // Draws the top part of the menu where game statistics would be.
     function drawStats() {
+        statCtx.clearRect(0, 0, canvasW, canvasH);
         statCtx.fillStyle = 'grey';
         statCtx.fillRect(0, 0, boardCanvas.width, 35);
     }
