@@ -217,12 +217,15 @@ const drawBoard = function() {
         count += drawLineOfHexes(posX, posY, 3, count);
 
         initializedHexes = true;
+        
+        drawStats();
+        drawMenu();
     }
 
     // Draws the bottom menu where game options would be
     function drawMenu() {
         menuCtx.fillStyle = 'grey';
-        menuCtx.fillRect(0, windowHeight - 120, boardCanvas.width, 120);
+        menuCtx.fillRect(0, innerHeight - 120, boardCanvas.width, 120);
     }
 
     // Draws the top part of the menu where game statistics would be.
@@ -254,7 +257,7 @@ const drawBoard = function() {
                 }
                 drawImgHexes(posXCanvas, posYCanvas);
             }
-            else if (mousePosY > innerHeight - 100) {
+            else if (mousePosY > innerHeight - 200 && mousePosY < innerHeight - 120) {
                 if (posYCanvas > - 500) {
                     posYCanvas -= 5;
                 }
