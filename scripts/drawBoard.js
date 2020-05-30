@@ -55,27 +55,47 @@ const drawBoard = function() {
     var hexesPos = new Array(numHexes * 2);
     var canvasBounds = boardCanvas.getBoundingClientRect();
 
-    // Draws an outline around a single hex with the specified starting point (top left) and color
-    function drawOutlineOrigin(originX, originY, color, stroke, count) {
-        let m2x, m2y, x0, y0, x1, y1, x2, y2, x3, y3, x4, y4;
+    // Derives coordinates of all points of a hex from top left origin point
+    function getPointsFromOrigin(originX, originY) {
+        var pointsArray = new Array(12);
 
-        m2x = originX;
-        m2y = originY + hexHeight / 2;
-        x0 = originX + hexWidth / 4;
-        y0 = m2y - hexHeight / 2;
-        x1 = x0 + hexWidth /2;
-        y1 = y0;
-        x2 = m2x + hexWidth;
-        y2 = m2y;
-        x3 = x1;
-        y3 = hexHeight + y1;
-        x4 = x0;
-        y4 = y3;
+        // m2x
+        pointsArray[0] = originX;
 
-        // Adds points to array to facilitate hex hitboxes.
-        hexesPos[count] = [m2x, m2y, x0, y0, x1, y1, x2, y2, x3, y3, x4, y4];
+        // m2y
+        pointsArray[1] = originY + hexHeight / 2;
 
-        drawOutline(m2x, m2y, x0, y0, x1, y1, x2, y2, x3, y3, x4, y4, color, stroke);
+        // x0
+        pointsArray[2] = originX + hexWidth / 4;
+
+        // y0
+        pointsArray[3] = pointsArray[1] - hexHeight / 2;
+
+        // x1
+        pointsArray[4] = pointsArray[2] + hexWidth /2;
+
+        // y1
+        pointsArray[5] = pointsArray[3];
+
+        // x2
+        pointsArray[6] = pointsArray[0] + hexWidth;
+
+        // y2
+        pointsArray[7] = pointsArray[1];
+
+        // x3
+        pointsArray[8] = pointsArray[4];
+
+        // y3
+        pointsArray[9] = hexHeight + pointsArray[5];
+
+        // x4
+        pointsArray[10] = pointsArray[2];
+
+        // y4
+        pointsArray[11] = pointsArray[9];
+
+        return pointsArray;
     }
 
     // Draws an outline around a hex with the specified dimensions and color
@@ -110,10 +130,10 @@ const drawBoard = function() {
         hexImgArray[6].src = "image_sources/grass.png";
     }
 
-    
     // Draws a line of hexes on the screen and initializes new hex objects.
     function drawLineOfHexes(posX, posY, num, count) {
         let i = 0, hexTypeToDraw = 0, randNum;
+        var pointsArray;
         
         for (i = 0; i < hexesPerRow - num; i++) {
             if (!initializedHexes) {
@@ -132,7 +152,16 @@ const drawBoard = function() {
             }
             
             boardCtx.drawImage(hexImgArray[hexTypeToDraw], posX, posY);
-            drawOutlineOrigin(posX, posY, 'black', 1, count + i);
+            pointsArray = getPointsFromOrigin(posX, posY);
+
+            hexesPos[count + i] = [pointsArray[0], pointsArray[1], pointsArray[2], pointsArray[3], pointsArray[4], pointsArray[5], pointsArray[6], pointsArray[7],
+            pointsArray[8], pointsArray[9], pointsArray[10], pointsArray[11]];
+
+            drawOutline(pointsArray[0], pointsArray[1], pointsArray[2], pointsArray[3], pointsArray[4], pointsArray[5], pointsArray[6], pointsArray[7],
+                        pointsArray[8], pointsArray[9], pointsArray[10], pointsArray[11], 'black', 1);
+
+            // drawOutlineOrigin(posX, posY, 'black', 1, count + i);
+            
             posX += 123;
         }
         return i;
@@ -261,7 +290,7 @@ const drawBoard = function() {
                 drawImgHexes(posXCanvas, posYCanvas);
             }
             else if (mousePosY > innerHeight - 200 && mousePosY < innerHeight - 120) {
-                if (posYCanvas > - 500) {
+                if (posYCanvas > - canvasH + innerHeight + 100) {
                     posYCanvas -= 5;
                 }
                 drawImgHexes(posXCanvas, posYCanvas);
@@ -277,7 +306,7 @@ const drawBoard = function() {
                 
             }
             else if (mousePosX > innerWidth - 100){
-                if (posXCanvas > -850) {
+                if (posXCanvas > -canvasW + innerWidth + 100) {
                     posXCanvas -= 5;
                 }
                 drawImgHexes(posXCanvas, posYCanvas);
@@ -373,123 +402,3 @@ const drawBoard = function() {
         }
     }
 }
-
-/*
-Keeping this here for now to show how specific hex values are calculated.
-
-// draws the hexes via the canvas. will be replaced by images.
-    // (changing the start point is bugged)
-    function drawHexes(numHexes, hexSizeW, hexSizeH, startPointX, startPointY) {
-        let i, m2x, m2y, x0, y0, x1, y1, x2, y2, x3, y3, x4, y4, shiftDist;
-        m2x = startPointX;
-        m2y = startPointY + hexSizeH / 2;
-        x0 = startPointX + hexSizeW / 4;
-        y0 = m2y - hexSizeH / 2;
-        x1 = x0 + hexSizeW /2;
-        y1 = y0;
-        x2 = m2x + hexSizeW;
-        y2 = m2y;
-        x3 = x1;
-        y3 = hexSizeH;
-        x4 = x0;
-        y4 = y3;
-
-        shiftDist = hexSizeW * 1.5;
-
-        for (i = 0; i <= numHexes; i++) {
-            boardCtx.fillStyle = colors[i];
-
-            if ((i - 1) % 16 == 0 || (i % 16 == 0)|| (i >= 0 && i <= 15) || (i >= 194 && i <= 208)) {
-                boardCtx.fillStyle = 'white';
-            }
-            boardCtx.beginPath();
-            boardCtx.moveTo(m2x, m2y);
-            boardCtx.lineTo(x0, y0);
-            boardCtx.lineTo(x1, y1);
-            boardCtx.lineTo(x2, y2);
-            boardCtx.lineTo(x3, y3);
-            boardCtx.lineTo(x4, y4);
-            boardCtx.lineTo(m2x, m2y);
-            boardCtx.closePath();
-            boardCtx.fill();
-
-            drawOutline(m2x, m2y, x0, y0, x1, y1, x2, y2, x3, y3, x4, y4, 'yellow');
-
-            hexesPos[i] = [m2x, m2y, x0, y0, x1, y1, x2, y2, x3, y3, x4, y4];
-            
-            m2x += shiftDist;
-            x0 += shiftDist;
-            x1 += shiftDist;
-            x2 += shiftDist;
-            x3 += shiftDist;
-            x4 += shiftDist;
-
-            if (i != 0 && i % (hexesPerRow) == 0) {
-                m2x = startPointX;
-                m2y += hexSizeH;
-                x0 = hexSizeW / 4;
-                y0 += hexSizeH;
-                x1 = hexSizeW / 4 + hexSizeW / 2;
-                y1 += hexSizeH;
-                x2 = hexSizeW;
-                y2 += hexSizeH;
-                x3 = x1;
-                y3 += hexSizeH;
-                x4 = x0;
-                y4 += hexSizeH;
-            }
-        }
-
-        m2x = -(hexSizeW / 4 + hexSizeW / 2);
-        m2y = startPointY - hexSizeH / 2 + (hexSizeH / 2);
-        x0 = -hexSizeW / 2;
-        y0 = -hexSizeH + (hexSizeH / 2);
-        x1 = startPointX;
-        y1 = -hexSizeH + (hexSizeH / 2);
-        x2 = hexSizeW / 4;
-        y2 = startPointY - hexSizeH / 2 + (hexSizeH / 2);
-        x3 = x1;
-        y3 = y1 + hexSizeH;
-        x4 = x0;
-        y4 = y0 + hexSizeH;
-
-        for (i = numHexes; i < numHexes * 3; i++) {
-            boardCtx.fillStyle = colors[i];
-
-            boardCtx.beginPath();
-            boardCtx.moveTo(m2x, m2y);
-            boardCtx.lineTo(x0, y0);
-            boardCtx.lineTo(x1, y1);
-            boardCtx.lineTo(x2, y2);
-            boardCtx.lineTo(x3, y3);
-            boardCtx.lineTo(x4, y4);
-            boardCtx.lineTo(m2x, m2y);
-            boardCtx.closePath();
-            boardCtx.fill();
-
-            hexesPos[i] = [m2x, m2y, x0, y0, x1, y1, x2, y2, x3, y3, x4, y4];
-            m2x += hexSizeW + hexSizeW / 2;
-            x0 += hexSizeW + hexSizeW / 2;
-            x1 += hexSizeW + hexSizeW / 2;
-            x2 += hexSizeW + hexSizeW / 2;
-            x3 += hexSizeW + hexSizeW / 2;
-            x4 += hexSizeW + hexSizeW / 2;
-
-            if (i != 0 && i % (hexesPerRow + 1) == 0) {
-                m2x = -(hexSizeW/2 + hexSizeW / 4);
-                m2y += hexSizeH;
-                x0 = -(hexSizeW / 2);
-                y0 += hexSizeH;
-                x1 = startPointX;
-                y1 += hexSizeH;
-                x2 = hexSizeW / 4;
-                y2 += hexSizeH;
-                x3 = startPointX;
-                y3 += hexSizeH;
-                x4 = -(hexSizeW / 2);
-                y4 += hexSizeH;
-            }
-        }
-    }
-*/
-
