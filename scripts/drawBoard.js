@@ -55,7 +55,7 @@ const drawBoard = function() {
     var hexesPos = new Array(numHexes * 2);
     var canvasBounds = boardCanvas.getBoundingClientRect();
 
-    // Derives coordinates of all points of a hex from top left origin point
+    // Derives coordinates of all points of a hex from the origin point (x,y)
     function getPointsFromOrigin(originX, originY) {
         var pointsArray = new Array(12);
 
@@ -135,9 +135,12 @@ const drawBoard = function() {
         let i = 0, hexTypeToDraw = 0, randNum;
         var pointsArray;
         
+        // Initializes hex objects
         for (i = 0; i < hexesPerRow - num; i++) {
             if (!initializedHexes) {
                 randNum = getRandomInt(31);
+
+                // Determines hex type from random number
                 if (randNum > 5) {
                     hexTypeToDraw = 6;
                 }
@@ -151,23 +154,25 @@ const drawBoard = function() {
                 hexTypeToDraw = hexes[count + i].getResourceNum();
             }
             
+            // Draws the hex images on the board
             boardCtx.drawImage(hexImgArray[hexTypeToDraw], posX, posY);
+
+            // Gets the points from where each hex is drawn
             pointsArray = getPointsFromOrigin(posX, posY);
 
+            // Stores hex points for hit detection
             hexesPos[count + i] = [pointsArray[0], pointsArray[1], pointsArray[2], pointsArray[3], pointsArray[4], pointsArray[5], pointsArray[6], pointsArray[7],
             pointsArray[8], pointsArray[9], pointsArray[10], pointsArray[11]];
 
+            // Draws outline around each hex
             drawOutline(pointsArray[0], pointsArray[1], pointsArray[2], pointsArray[3], pointsArray[4], pointsArray[5], pointsArray[6], pointsArray[7],
                         pointsArray[8], pointsArray[9], pointsArray[10], pointsArray[11], 'black', 1);
-
-            // drawOutlineOrigin(posX, posY, 'black', 1, count + i);
             
             posX += 123;
         }
         return i;
     }
 
-    // W = 82, H = 71
     // (This board is drawn manually)
     function drawImgHexes(startPosX, posY) {
         let posX = startPosX;
