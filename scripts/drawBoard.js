@@ -4,6 +4,11 @@ var hexWidth = 82;
 var hexHeight = 71;
 var hexes = new Array(300);
 var initializedHexes = false;
+var initializedMenu = false;
+var selectedHex = null;
+var drawBoardStartPositionX = 225;
+var drawBoardStartPositionY = 106;
+var buttonClickedId = null;
 
 // Gets a random int from 0 to max - 1.
 function getRandomInt(max) {
@@ -21,8 +26,11 @@ const drawBoard = function() {
     var bottomMenuCanvas = document.getElementById("bottomMenuCanvas");
     var menuCtx = bottomMenuCanvas.getContext("2d");
 
-    var splashMenuCanvas = document.getElementById("menuScreen");
-    var splashCtx = splashMenuCanvas.getContext("2d");
+    var infoMenu = document.getElementById("infoMenu");
+    var infoCtx = infoMenu.getContext("2d");
+
+    var splashScreen = document.getElementById("splashScreen");
+    var splashCtx = splashScreen.getContext("2d");
 
     // var windowWidth = window.innerWidth;
     // var windowHeight = window.innerHeight;
@@ -114,6 +122,12 @@ const drawBoard = function() {
         boardCtx.stroke();
     }
 
+    function drawOutlineOrigin(originX, originY, color, stroke) {
+        var pointsArray = getPointsFromOrigin(originX, originY);
+        drawOutline(pointsArray[0], pointsArray[1], pointsArray[2], pointsArray[3], pointsArray[4], pointsArray[5], pointsArray[6], pointsArray[7],
+            pointsArray[8], pointsArray[9], pointsArray[10], pointsArray[11], color, stroke);
+    }
+
     const numHexTypes = 7;
     var hexImgArray = new Array(numHexTypes);
     function loadImgHexes() {
@@ -165,9 +179,7 @@ const drawBoard = function() {
             pointsArray[8], pointsArray[9], pointsArray[10], pointsArray[11]];
 
             // Draws outline around each hex
-            drawOutline(pointsArray[0], pointsArray[1], pointsArray[2], pointsArray[3], pointsArray[4], pointsArray[5], pointsArray[6], pointsArray[7],
-                        pointsArray[8], pointsArray[9], pointsArray[10], pointsArray[11], 'black', 1);
-            
+            drawOutlineOrigin(pointsArray[0], pointsArray[3], 'black', 1);
             posX += 123;
         }
         return i;
@@ -253,15 +265,52 @@ const drawBoard = function() {
 
         initializedHexes = true;
         
+        if (selectedHex != null) {
+            drawOutlineOrigin(hexesPos[selectedHex][0], hexesPos[selectedHex][3], 'yellow', 2)
+        }
+
         drawStats();
-        drawMenu();
+        drawMenu(buttonClickedId);
+    }
+
+    // Load menu assets
+    const numMenuAssets = 4;
+    var menuImgArray = new Array(numMenuAssets);
+    function loadMenuAssets() { 
+        for (i = 0; i < numMenuAssets; i++) {
+            menuImgArray[i] = new Image();
+        }
+
+        menuImgArray[0].src = "image_sources/end_turn_button_greyed.png"
+        menuImgArray[1].src = "image_sources/end_turn_button.png";
+        menuImgArray[2].src = "image_sources/military_button.png";
+        menuImgArray[3].src = "image_sources/economy_button.png";
     }
 
     // Draws the bottom menu where game options would be
-    function drawMenu() {
+    function drawMenu(buttonId) {
         menuCtx.clearRect(0, 0, canvasW, canvasH);
+
+        if (buttonId == null) {
+            buttonId = 1;
+        }
+        menuCtx.drawImage(menuImgArray[buttonId], innerWidth / 2 - 60, innerHeight - 120);
+        menuCtx.drawImage(menuImgArray[2], innerWidth / 2 - 200, innerHeight - 85);
+        menuCtx.drawImage(menuImgArray[3], innerWidth / 2 + 80, innerHeight - 85);
+
+        initializedMenu = true;
+    }
+
+    function drawInfoMenu(menuType) {
+        if (menuType == 1) {
+            // Draw military menu
+        }
+        else if (menuType == 2) {
+            // Draw economy menu
+        }
+        menuCtx.clearRect;
         menuCtx.fillStyle = 'grey';
-        menuCtx.fillRect(0, innerHeight - 120, boardCanvas.width, 120);
+        menuCtx.fillRect(innerWidth / 2 - 250, innerHeight / 2 - 350, 500, 600);
     }
 
     // Draws the top part of the menu where game statistics would be.
@@ -271,23 +320,30 @@ const drawBoard = function() {
         statCtx.fillRect(0, 0, boardCanvas.width, 35);
     }
 
+    // Drawing the board
     drawStats();
-    drawMenu();
     loadImgHexes();
     hexImgArray[numHexTypes - 1].onload = function() {
-        drawImgHexes(225, 106);
+        drawImgHexes(drawBoardStartPositionX, drawBoardStartPositionY);
     }
 
+    loadMenuAssets();
+    menuImgArray[numMenuAssets - 1].onload = function () {
+        drawMenu(1);
+    }
+
+    // Events
     document.addEventListener("mousemove", canvasEdgeScroll, false);
     document.addEventListener("click", mouseHandlerHex, false);
     window.addEventListener("scroll", scrollHandler, false);
 
+    // Scrolls the map
     let posXCanvas = 225, posYCanvas = 106;
     function canvasEdgeScroll (e) {
         mousePosX = e.clientX;
         mousePosY = e.clientY;
 
-        if (canvasH > innerHeight) {
+        if (canvasH - 100 > innerHeight) {
             if (mousePosY < 100) {
                 if (posYCanvas < 106) {
                     posYCanvas += 5;
@@ -349,61 +405,79 @@ const drawBoard = function() {
         // m holds slope and b holds the intercept
         var m, b;
 
-        if (mousePosY < 26 || mousePosY > windowHeight - 120) {
+        if (mousePosY > innerHeight - 120) {
+            // Middle button
+            if (mousePosX > innerWidth / 2 - 60 && mousePosX < innerWidth / 2 + 60) {
+                buttonClickedId = 0;
+                drawMenu(buttonClickedId);
+            }
+            // Military menu button
+            else if (mousePosX > innerWidth / 2 - 200 && mousePosX < innerWidth / 2 - 80) {
+                drawInfoMenu(1);
+            }
+            else if (mousePosX > innerWidth / 2 + 80 && mousePosX < innerWidth / 2 + 200) {
+                drawInfoMenu(2);
+            }
+        }
+        else if (mousePosY < 26) {
             return;
         }
-
-        for (i = 0; i < numHexes * 3; i++) {
-            if (mousePosY > hexesPos[i][3] && mousePosY < hexesPos[i][11]) {
-                if (mousePosX > hexesPos[i][2]) {
-                    if (mousePosX < hexesPos[i][4]) {
-                        isClicked = true;
+        else {
+            for (i = 0; i < numHexes * 3; i++) {
+                if (mousePosY > hexesPos[i][3] && mousePosY < hexesPos[i][11]) {
+                    if (mousePosX > hexesPos[i][2]) {
+                        if (mousePosX < hexesPos[i][4]) {
+                            isClicked = true;
+                        }
+                        else if (mousePosX < hexesPos[i][6]) {
+                            if (mousePosY < hexesPos[i][7]) {
+                                m = slope(hexesPos[i][6], hexesPos[i][7], hexesPos[i][4], hexesPos[i][5]);
+                                b = intercept(hexesPos[i][6], hexesPos[i][7], m);
+                                if (mousePosY > m * mousePosX + b) {
+                                    isClicked = true;
+                                }
+                            }
+                            else if (mousePosY > hexesPos[i][7]) {
+                                m = slope(hexesPos[i][6], hexesPos[i][7], hexesPos[i][8], hexesPos[i][9]);
+                                b = intercept(hexesPos[i][6], hexesPos[i][7], m);
+                                if (mousePosY < m * mousePosX + b) {
+                                    isClicked = true;
+                                }
+                            }
+                        }
                     }
-                    else if (mousePosX < hexesPos[i][6]) {
-                        if (mousePosY < hexesPos[i][7]) {
-                            m = slope(hexesPos[i][6], hexesPos[i][7], hexesPos[i][4], hexesPos[i][5]);
-                            b = intercept(hexesPos[i][6], hexesPos[i][7], m);
+                    else if (mousePosX > hexesPos[i][0]) {
+                        if (mousePosY < hexesPos[i][1]) {
+                            m = slope(hexesPos[i][0], hexesPos[i][1], hexesPos[i][2], hexesPos[i][3]);
+                            b = intercept(hexesPos[i][0], hexesPos[i][1], m);
                             if (mousePosY > m * mousePosX + b) {
                                 isClicked = true;
                             }
                         }
-                        else if (mousePosY > hexesPos[i][7]) {
-                            m = slope(hexesPos[i][6], hexesPos[i][7], hexesPos[i][8], hexesPos[i][9]);
-                            b = intercept(hexesPos[i][6], hexesPos[i][7], m);
+                        else if (mousePosY > hexesPos[i][1]) {
+                            m = slope(hexesPos[i][0], hexesPos[i][1], hexesPos[i][10], hexesPos[i][11]);
+                            b = intercept(hexesPos[i][0], hexesPos[i][1], m);
                             if (mousePosY < m * mousePosX + b) {
                                 isClicked = true;
                             }
                         }
                     }
-                }
-                else if (mousePosX > hexesPos[i][0]) {
-                    if (mousePosY < hexesPos[i][1]) {
-                        m = slope(hexesPos[i][0], hexesPos[i][1], hexesPos[i][2], hexesPos[i][3]);
-                        b = intercept(hexesPos[i][0], hexesPos[i][1], m);
-                        if (mousePosY > m * mousePosX + b) {
-                            isClicked = true;
-                        }
-                    }
-                    else if (mousePosY > hexesPos[i][1]) {
-                        m = slope(hexesPos[i][0], hexesPos[i][1], hexesPos[i][10], hexesPos[i][11]);
-                        b = intercept(hexesPos[i][0], hexesPos[i][1], m);
-                        if (mousePosY < m * mousePosX + b) {
-                            isClicked = true;
-                        }
+    
+                    if (isClicked) {
+                        // For debugging/testing
+                        console.log("This is hex #" + i + ".");
+                        console.log("Econ score: " + hexes[i].getEconScore())
+                        console.log("Resource given: " + hexes[i].getResource());
+                        player[0].addTerritory(i);
+                        console.log(player[0].getHexesControlled());
+                        console.log("\n");
+                        selectedHex = i;
+                        drawImgHexes(drawBoardStartPositionX, drawBoardStartPositionY);
                     }
                 }
-
-                if (isClicked) {
-                    console.log("This is hex #" + i + ".");
-                    console.log("Econ score: " + hexes[i].getEconScore())
-                    console.log("Resource given: " + hexes[i].getResource());
-                    player[0].addTerritory(i);
-                    console.log(player[0].getHexesControlled());
-                    console.log("\n");
-                }
+                
+                isClicked = false;
             }
-            
-            isClicked = false;
         }
     }
 }
