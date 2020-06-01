@@ -1,6 +1,6 @@
 function Player() {
     var ip, ep, mp;
-    let hexesControlled = [];
+    let hexesControlled = new Set();
     var name = "player";
 
     // Influence points
@@ -63,7 +63,7 @@ function Player() {
     }
 
     this.addTerritory = function(hexNum) {
-        hexesControlled.push(hexNum);
+        hexesControlled.add(hexNum);
     }
 
     this.getHexesControlled = function() {
