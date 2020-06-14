@@ -1,22 +1,31 @@
-var bank = new Bank();
-
 var numPlayers = 4
+
+var bank = new Bank();
 var player = new Array(numPlayers);
 
-let i;
-for (i = 0; i < numPlayers; i++) {
+for (let i = 0; i < numPlayers; i++) {
     player[i] = new Player();
 }
 
-var turn = 0;
-// var hex = new Hex(6);
-// console.log(hex.getEconScore());
+/*
+*  Note: This gameloop is different than most other games since the game only renders based on user input.
+*  Therefore there's no need to constantly rerender the screen. This will probably get replaced with something later
+*  based on turn logic and player actions.
+*/
 
-// console.log(hex.getResource())
-// console.log(player[0].getIp());
-player[0].incrementIp(5);
-// console.log(player[0].getIp());
+var currentTurn = 0;
+var highestIP = 0;
+function game() {
+    drawBoard();
+    turn();
 
-drawBoard();
+    for (let i = 0; i < numPlayers; i++) {
+        highestIP = Math.max(highestIP, player[i].ip);
+    }
 
-console.log("hi!");
+    if (highestIP < 1000) {
+        // End the game
+    }
+}
+
+game();

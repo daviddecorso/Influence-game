@@ -320,9 +320,15 @@ const drawBoard = function() {
         statCtx.fillRect(0, 0, boardCanvas.width, 35);
     }
 
+    var testAudio;
+    function loadSounds() {
+        testAudio = new Audio("sounds\\Book_TurnPage_04.wav");
+    }
+
     // Drawing the board
     drawStats();
     loadImgHexes();
+    loadSounds();
     hexImgArray[numHexTypes - 1].onload = function() {
         drawImgHexes(drawBoardStartPositionX, drawBoardStartPositionY);
     }
@@ -405,17 +411,21 @@ const drawBoard = function() {
         // m holds slope and b holds the intercept
         var m, b;
 
+        // Menu hitboxes
         if (mousePosY > innerHeight - 120) {
             // Middle button
             if (mousePosX > innerWidth / 2 - 60 && mousePosX < innerWidth / 2 + 60) {
                 buttonClickedId = 0;
+                player[1].ip = 1000;
                 drawMenu(buttonClickedId);
             }
             // Military menu button
             else if (mousePosX > innerWidth / 2 - 200 && mousePosX < innerWidth / 2 - 80) {
+                testAudio.play();
                 drawInfoMenu(1);
             }
             else if (mousePosX > innerWidth / 2 + 80 && mousePosX < innerWidth / 2 + 200) {
+                testAudio.play();
                 drawInfoMenu(2);
             }
         }
@@ -468,8 +478,10 @@ const drawBoard = function() {
                         console.log("This is hex #" + i + ".");
                         console.log("Econ score: " + hexes[i].getEconScore())
                         console.log("Resource given: " + hexes[i].getResource());
-                        player[0].addTerritory(i);
+                        addTerritory(0, i);
                         console.log(player[0].getHexesControlled());
+                        // removeTerritory(0, i);
+                        // console.log(player[0].getHexesControlled());
                         console.log("\n");
                         selectedHex = i;
                         drawImgHexes(drawBoardStartPositionX, drawBoardStartPositionY);

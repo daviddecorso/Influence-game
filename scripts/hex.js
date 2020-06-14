@@ -1,3 +1,68 @@
+function Hex(hexType) {
+    this.econScore = randEconScore();
+    this.resourceGiven;
+    this.resourceNum = hexType;
+    this.givesResources = true;
+    this.movementScore;
+    this.defensiveScore;
+    this.hasUnits = false;
+
+    switch(hexType) {
+        case ResourceEnum.IRON:
+            this.resourceGiven = 'ironOre';
+            break;
+        case ResourceEnum.JEWEL:
+            this.resourceGiven = 'jewels';
+            break;
+        case ResourceEnum.LEATHER:
+            this.resourceGiven = 'leather';
+            break;
+        case ResourceEnum.SPICE:
+            this.resourceGiven = 'spices';
+            break;
+        case ResourceEnum.STONE:
+            this.resourceGiven = 'stone';
+            break;
+        case ResourceEnum.WOOD:
+            this.resourceGiven = 'wood';
+            break;
+        default:
+            this.givesResources = false;
+            break;
+    }
+
+    // Put these in the switch statement above when terrain is implemented
+    this.movementScore = 1;
+
+    this.defensiveScore = 1;
+
+    this.getEconScore = function() {
+        return this.econScore;
+    }
+    this.getResource = function() {
+        if (this.givesResources) {
+            return this.resourceGiven;
+        }
+        else {
+            return null;
+        }
+    }
+    this.getMovementScore = function() {
+        return this.movementScore;
+    }
+    this.getDefensiveScore = function() {
+        return this.defensiveScore;
+    }
+    this.isResourceHex = function() {
+        return this.givesResources;
+    }
+    this.getResourceNum = function() {
+        return this.resourceNum;
+    }
+
+}
+
+// 50% chance of returning 2, 25% chance each of returning 1 and 3.
 function randEconScore() {
     var randScore = getRandomInt(4);
 
@@ -10,66 +75,4 @@ function randEconScore() {
     else {
         return 3;
     }
-}
-
-function Hex(hexType) {
-    var econScore = randEconScore();
-    var resourceGiven;
-    var resourceNum = hexType;
-    var givesResources = true;
-    var movementScore;
-    var defensiveScore;
-
-    switch(hexType) {
-        case 0:
-            resourceGiven = 'ironOre';
-            break;
-        case 1:
-            resourceGiven = 'jewels';
-            break;
-        case 2:
-            resourceGiven = 'leather';
-            break;
-        case 3:
-            resourceGiven = 'spices';
-            break;
-        case 4:
-            resourceGiven = 'stone';
-            break;
-        case 5:
-            resourceGiven = 'wood';
-            break;
-        default:
-            givesResources = false;
-            break;
-    }
-
-    movementScore = 1;
-
-    defensiveScore = 1;
-
-    this.getEconScore = function() {
-        return econScore;
-    }
-    this.getResource = function() {
-        if (givesResources) {
-            return resourceGiven;
-        }
-        else {
-            return null;
-        }
-    }
-    this.getMovementScore = function() {
-        return movementScore;
-    }
-    this.getDefensiveScore = function() {
-        return defensiveScore;
-    }
-    this.isResourceHex = function() {
-        return givesResources;
-    }
-    this.getResourceNum = function() {
-        return resourceNum;
-    }
-
 }

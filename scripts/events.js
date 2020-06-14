@@ -1,0 +1,4 @@
+// Manages events
+function eventManager() {
+
+}

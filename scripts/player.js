@@ -1,41 +1,32 @@
 function Player() {
-    var ip, ep, mp;
-    let hexesControlled = new Set();
-    var name = "player";
+    this.name = "player";
+
+    this.hexesControlled = new Set();
+
+    this.numPlayerResources = new Array(numResources);
 
     // Influence points
-    ip = 0;
+    this.ip = 0;
 
     // Economy points
-    ep = 0;
+    this.ep = 0;
 
     // Military points
-    mp = 0;
+    this.mp = 0;
 
     // Political points
-    pp = 0;
-
-    this.getIp = function() {
-        return ip;
-    }
-    this.getEp = function() {
-        return ep;
-    }
-    this.getMp = function() {
-        return mp;
-    }
-    this.getPp = function() {
-        return pp;
-    }
+    this.pp = 0;
 
     this.setName = function(name) {
         name = this.name;
     }
+
+    // Remove these
     this.incrementIp = function(numPoints) {
-        ip += numPoints;
+        this.ip += numPoints;
     }
     this.decrementIp = function(numPoints) {
-        ip -= numPoints;
+        this.ip -= numPoints;
     }
     this.incrementEp = function(numPoints) {
         this.ep += numPoints;
@@ -62,11 +53,15 @@ function Player() {
         this.ap += ap;
     }
 
-    this.addTerritory = function(hexNum) {
-        hexesControlled.add(hexNum);
+    this.addHex = function(hexNum) {
+        this.hexesControlled.add(hexNum);
+    }
+
+    this.removeHex = function (hexNum) {
+        this.hexesControlled.delete(hexNum);
     }
 
     this.getHexesControlled = function() {
-        return hexesControlled;
+        return this.hexesControlled;
     }
 }
