@@ -58,8 +58,6 @@ const drawBoard = function() {
     setCanvasSize();
     setNumHexes(hexWidth, hexHeight);
 
-    var mousePosX = -1;
-    var mousePosY = -1;
     var hexesPos = new Array(numHexes * 2);
     var canvasBounds = boardCanvas.getBoundingClientRect();
 
@@ -339,52 +337,111 @@ const drawBoard = function() {
     }
 
     // Events
-    document.addEventListener("mousemove", canvasEdgeScroll, false);
+    document.addEventListener("mousemove", setMousePos, false);
     document.addEventListener("click", mouseHandlerHex, false);
-    window.addEventListener("scroll", scrollHandler, false);
 
     // Scrolls the map
-    let posXCanvas = 225, posYCanvas = 106;
-    function canvasEdgeScroll (e) {
+    var mousePosX = -1;
+    var mousePosY = -1;
+
+    // Initial position of the canvas
+    var posXCanvas = 225, posYCanvas = 106;
+
+    // Stores if the board is currently scrolling
+    var scrolling = false;
+
+    // Distance from last mouse move
+    var deltaX, deltaY;
+
+    // Amount the board should scroll
+    var scrollDistX = 0, scrollDistY = 0;
+
+    // Keeps track of the mouse
+    function setMousePos(e) {
+        deltaX = e.movementX;
+        deltaY = e.movementY;
         mousePosX = e.clientX;
-        mousePosY = e.clientY;
+        mousePosY = e.movementY;
+        canvasEdgeScroll(e);
+    }
 
-        if (canvasH - 100 > innerHeight) {
-            if (mousePosY < 100) {
-                if (posYCanvas < 106) {
-                    posYCanvas += 5;
-                }
-                drawImgHexes(posXCanvas, posYCanvas);
-            }
-            else if (mousePosY > innerHeight - 200 && mousePosY < innerHeight - 120) {
-                if (posYCanvas > - canvasH + innerHeight + 100) {
-                    posYCanvas -= 5;
-                }
-                drawImgHexes(posXCanvas, posYCanvas);
-            }
+    function scrollRight() {
+        if (deltaX >= 0 && mousePosX < window.innerWidth && scrollDistX < canvasW - window.innerWidth) {
+            posXCanvas -= 5;
+            scrollDistX += 5;
+            drawImgHexes(posXCanvas, posYCanvas);
+            requestAnimationFrame(scrollRight);
         }
-
-        if (canvasW > innerWidth) {
-            if (mousePosX < 100) {
-                if (posXCanvas < 225) {
-                    posXCanvas += 5;
-                }
-                drawImgHexes(posXCanvas, posYCanvas);
-                
-            }
-            else if (mousePosX > innerWidth - 100){
-                if (posXCanvas > -canvasW + innerWidth + 100) {
-                    posXCanvas -= 5;
-                }
-                drawImgHexes(posXCanvas, posYCanvas);
-            }
+        else {
+            scrolling = false;
         }
     }
 
-    // Gets canvas bounds on scroll
-    function scrollHandler(e) {
-        bounds = canvas.getBoundingClientRect();
-        canvasBounds = boardCanvas.getBoundingClientRect();
+    function scrollLeft() {
+        if (deltaX <= 0 && mousePosX > 0 && scrollDistX > 0) {
+            posXCanvas += 5;
+            scrollDistX -= 5;
+            drawImgHexes(posXCanvas, posYCanvas);
+            requestAnimationFrame(scrollLeft);
+        }
+        else {
+            scrolling = false;
+        }
+    }
+
+    function scrollUp() {
+        if (deltaY <= 0 && mousePosY > 0 && scrollDistY > 0) {
+            posYCanvas += 3;
+            scrollDistY -= 3;
+            drawImgHexes(posXCanvas, posYCanvas);
+            requestAnimationFrame(scrollUp);
+        }
+        else {
+            scrolling = false;
+        }
+    }
+
+    function scrollDown() {
+        if (deltaY >= 0 && mousePosY < window.innerHeight && scrollDistY < canvasH - window.innerHeight) {
+            posYCanvas -= 3;
+            scrollDistY += 3;
+            drawImgHexes(posXCanvas, posYCanvas);
+            requestAnimationFrame(scrollDown);
+        }
+        else {
+            scrolling = false;
+        }
+    }
+
+    function canvasEdgeScroll (e) {
+        if (!scrolling) {
+            mousePosX = e.clientX;
+            mousePosY = e.clientY;
+
+            if (canvasH - 100 > window.innerHeight) {
+                if (mousePosY < 100) {
+                    if (scrollDistY > 0) {
+                        scrolling = true;
+                        scrollUp();                         
+                    }
+                }
+                else if (mousePosY > window.innerHeight - 200 && mousePosY < window.innerHeight - 120) {
+                        scrolling = true;
+                        scrollDown();
+                }
+            }
+    
+            if (canvasW > innerWidth) {
+                if (mousePosX < 100) {
+                    scrolling = true;
+                    scrollLeft();                    
+                }
+                else if (mousePosX > innerWidth - 100) {
+                    scrolling = true;
+                    scrollRight();
+                }
+            }
+        }
     }
 
     // Calculates slope for hitbox detection
@@ -484,7 +541,7 @@ const drawBoard = function() {
                         // console.log(player[0].getHexesControlled());
                         console.log("\n");
                         selectedHex = i;
-                        drawImgHexes(drawBoardStartPositionX, drawBoardStartPositionY);
+                        drawImgHexes(posXCanvas, posYCanvas);
                     }
                 }
                 
