@@ -5,6 +5,10 @@ function Player() {
 
     this.numPlayerResources = new Array(numResources);
 
+    for (let i = 0; i < numResources; i++) {
+        this.numPlayerResources[i] = 0;
+    }
+
     // Influence points
     this.ip = 0;
 
@@ -17,6 +21,7 @@ function Player() {
     // Political points
     this.pp = 0;
 
+    // Sets the player's name
     this.setName = function(name) {
         name = this.name;
     }

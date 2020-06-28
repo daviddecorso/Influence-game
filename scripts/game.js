@@ -8,24 +8,12 @@ for (let i = 0; i < numPlayers; i++) {
 }
 
 /*
-*  Note: This gameloop is different than most other games since the game only renders based on user input.
-*  Therefore there's no need to constantly rerender the screen. This will probably get replaced with something later
-*  based on turn logic and player actions.
+    Need something here to start game so things are loaded in
+    (Also will have a starting menu)
 */
 
 var currentTurn = 0;
 var highestIP = 0;
-function game() {
-    drawBoard();
-    turn();
 
-    for (let i = 0; i < numPlayers; i++) {
-        highestIP = Math.max(highestIP, player[i].ip);
-    }
-
-    if (highestIP < 1000) {
-        // End the game
-    }
-}
-
-game();
+drawBoard();
+turn();

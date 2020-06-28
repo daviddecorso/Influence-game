@@ -7,8 +7,7 @@
     <style>
         * { padding: 0; margin: 0; }
         canvas { position: absolute; }
-        #spashScreen { z-index: 4; }
-        #infoMenu { z-index: 3; }
+        #spashScreen { z-index: 3; }
         #topBarCanvas { z-index: 2; }
         #bottomMenuCanvas { z-index: 2; }
         #boardCanvas { z-index: 1; }
@@ -17,11 +16,11 @@
     <body>
         <div id="game">
             <canvas id="splashScreen"></canvas>
-            <canvas id="infoMenu"></canvas>
             <canvas id="topBarCanvas"></canvas>
             <canvas id="bottomMenuCanvas"></canvas>
             <canvas id="boardCanvas"></canvas>
         </div>
+        <script src="scripts/unit.js"></script>
         <script src="scripts/hex.js"></script>
         <script src="scripts/player.js"></script>
         <script src="scripts/bank.js"></script>

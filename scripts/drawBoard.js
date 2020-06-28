@@ -9,6 +9,8 @@ var selectedHex = null;
 var drawBoardStartPositionX = 225;
 var drawBoardStartPositionY = 106;
 var buttonClickedId = null;
+var popUpClicked = false;
+const menuEnum = Object.freeze({"UNCLICKED" : 0, "ENDTURN" : 1, "MILITARY" : 2, "ECONOMY" : 3, "PRODUCTION" : 4});
 
 // Gets a random int from 0 to max - 1.
 function getRandomInt(max) {
@@ -25,9 +27,6 @@ const drawBoard = function() {
 
     var bottomMenuCanvas = document.getElementById("bottomMenuCanvas");
     var menuCtx = bottomMenuCanvas.getContext("2d");
-
-    var infoMenu = document.getElementById("infoMenu");
-    var infoCtx = infoMenu.getContext("2d");
 
     var splashScreen = document.getElementById("splashScreen");
     var splashCtx = splashScreen.getContext("2d");
@@ -49,6 +48,7 @@ const drawBoard = function() {
         canvasH = boardCanvas.height;
     }
 
+    // Remove this
     // Determines the number of hexes to draw based on hex size and canvas width/height
     function setNumHexes(W, H) {
         hexesPerRow = Math.floor(windowWidth / (W * 1.5) + 1);
@@ -120,12 +120,14 @@ const drawBoard = function() {
         boardCtx.stroke();
     }
 
+    // Draws an outline around a hex using single x,y coordinate as the origin.
     function drawOutlineOrigin(originX, originY, color, stroke) {
         var pointsArray = getPointsFromOrigin(originX, originY);
         drawOutline(pointsArray[0], pointsArray[1], pointsArray[2], pointsArray[3], pointsArray[4], pointsArray[5], pointsArray[6], pointsArray[7],
             pointsArray[8], pointsArray[9], pointsArray[10], pointsArray[11], color, stroke);
     }
 
+    // Loads hex images
     const numHexTypes = 7;
     var hexImgArray = new Array(numHexTypes);
     function loadImgHexes() {
@@ -159,11 +161,11 @@ const drawBoard = function() {
                 else {
                     hexTypeToDraw = randNum;
                 }
-                hexes[count + i] = new Hex(hexTypeToDraw);
+                hexes[count + i] = new Hex(hexTypeToDraw, posX, posY);
                 
             }
             else {
-                hexTypeToDraw = hexes[count + i].getResourceNum();
+                hexTypeToDraw = hexes[count + i].resourceNum;
             }
             
             // Draws the hex images on the board
@@ -183,7 +185,7 @@ const drawBoard = function() {
         return i;
     }
 
-    // (This board is drawn manually)
+    // Board is drawn manually
     function drawImgHexes(startPosX, posY) {
         let posX = startPosX;
         let count = 0;
@@ -267,8 +269,9 @@ const drawBoard = function() {
             drawOutlineOrigin(hexesPos[selectedHex][0], hexesPos[selectedHex][3], 'yellow', 2)
         }
 
+        // Remove these after menus can be closed
         drawStats();
-        drawMenu(buttonClickedId);
+        drawMenu();
     }
 
     // Load menu assets
@@ -286,29 +289,106 @@ const drawBoard = function() {
     }
 
     // Draws the bottom menu where game options would be
-    function drawMenu(buttonId) {
+    function drawMenu() {
         menuCtx.clearRect(0, 0, canvasW, canvasH);
 
-        if (buttonId == null) {
-            buttonId = 1;
-        }
-        menuCtx.drawImage(menuImgArray[buttonId], innerWidth / 2 - 60, innerHeight - 120);
+        menuCtx.drawImage(menuImgArray[1], innerWidth / 2 - 60, innerHeight - 120);
         menuCtx.drawImage(menuImgArray[2], innerWidth / 2 - 200, innerHeight - 85);
         menuCtx.drawImage(menuImgArray[3], innerWidth / 2 + 80, innerHeight - 85);
 
         initializedMenu = true;
     }
 
+    // Draws the menus that pop up in the middle of the screen (military, production, economy, etc.)
     function drawInfoMenu(menuType) {
-        if (menuType == 1) {
-            // Draw military menu
-        }
-        else if (menuType == 2) {
-            // Draw economy menu
-        }
         menuCtx.clearRect;
         menuCtx.fillStyle = 'grey';
         menuCtx.fillRect(innerWidth / 2 - 250, innerHeight / 2 - 350, 500, 600);
+
+        // Draws info to the menu based on menu type
+        switch (menuType) {
+            case menuEnum.MILITARY:
+                menuCtx.fillStyle = 'black';
+                menuCtx.font = '36px sans-serif';
+                menuCtx.fillText("MILITARY OVERVIEW:", innerWidth / 2 - 195, innerHeight / 2 - 305);
+
+                menuCtx.font = '24px sans-serif';
+                menuCtx.fillText("Total: Soldiers: Archers: Cavalry: ", innerWidth / 2 - 195, innerHeight / 2 - 260);
+
+                let militaryMenuString = "";
+                let hexTotalUnits = 0;
+                let militaryMenuTextPosX = innerWidth / 2 - 230, militaryMenuTextPosY = innerHeight / 2 - 225;
+                for (let hex of player[currentPlayer].hexesControlled) {
+                    if (hexes[hex].units.length > 0) {
+                        for (let i = 0; i < hexes[hex].unitSum.length; i++) {
+                            hexTotalUnits += hexes[hex].unitSum[i];
+                        }
+                        militaryMenuString += "Hex " + hex + ": Total: " + hexTotalUnits + ", Soldiers: " + hexes[hex].unitSum[0] + ", Archers: " + hexes[hex].unitSum[1] + ", Cavalry " + hexes[hex].unitSum[2];
+                        menuCtx.font = '20px sans-serif';
+                        menuCtx.fillText(militaryMenuString, militaryMenuTextPosX, militaryMenuTextPosY);
+                        militaryMenuTextPosY += 30;
+                        militaryMenuString = "";
+                    }
+                }
+                break;
+
+            case menuEnum.ECONOMY:
+                menuCtx.fillStyle = 'black';
+                menuCtx.font = '36px sans-serif';
+
+                menuCtx.fillText("MARKET:", innerWidth / 2 - 80, innerHeight / 2 - 305);
+
+                let demandString = "Resource in demand: " + bank.resourceInDemand;
+                menuCtx.font = '28px sans-serif';
+                menuCtx.fillText(demandString, innerWidth / 2 - 230, innerHeight / 2 - 260);
+
+                let econMenuString = "";
+                let econMenuTextPosX = innerWidth / 2 - 230, econMenuTextPosY = innerHeight / 2 - 210;
+                for (let i = 0; i < numResources; i++) {
+                    econMenuString += bank.resources[i].typeString + ": " + bank.resources[i].buyPrice + "s/" + bank.resources[i].sellPrice + "b " 
+
+                    menuCtx.font = '24px sans-serif';
+                    menuCtx.fillText(econMenuString, econMenuTextPosX, econMenuTextPosY);
+                    econMenuTextPosY += 50;
+                    econMenuString = "";
+                }
+                break;  
+                
+            case menuEnum.PRODUCTION:
+                menuCtx.fillStyle = 'black';
+                menuCtx.font = '36px sans-serif';
+                menuCtx.fillText("PRODUCTION:", innerWidth / 2 - 135, innerHeight / 2 - 305);
+                break;
+
+            default:
+                break;
+        }
+    }
+
+    // Draws pop up that instructs users to select their starting hex
+    this.drawCapitalInfo = function () {
+        menuCtx.clearRect(0, 0, canvasW, canvasH);
+        drawMenu();
+        menuCtx.fillStyle = 'grey';
+        menuCtx.fillRect(innerWidth / 2 - 400, innerHeight / 2 - 100, 800, 200);
+
+        menuCtx.fillStyle = 'black';
+        menuCtx.font = '48px sans-serif';
+        menuCtx.fillText("Select your starting hex on the map:", innerWidth / 2 - 400 + 15, innerHeight / 2);
+        menuCtx.fillText("Ok", innerWidth / 2 - 40, innerHeight / 2 + 70);
+    }
+
+    // Draws units to the board (design is temporary)
+    this.drawUnits = function (hexNum) {
+        boardCtx.beginPath();
+        boardCtx.lineWidth = 1;
+        boardCtx.strokeStyle = 'black';
+        boardCtx.fillStyle = 'red';
+        boardCtx.arc((hexes[hexNum].originX + 53), (hexes[hexNum].originY + 55), 10, 0, Math.PI * 2, true);
+        boardCtx.fill();
+        boardCtx.fillStyle = 'white';
+        boardCtx.font = '12px sans-serif';
+        boardCtx.fillText(hexes[hexNum].numUnits, (hexes[hexNum].originX + 49.5), (hexes[hexNum].originY + 59));
     }
 
     // Draws the top part of the menu where game statistics would be.
@@ -318,6 +398,7 @@ const drawBoard = function() {
         statCtx.fillRect(0, 0, boardCanvas.width, 35);
     }
 
+    // Loads audio (currently for testing)
     var testAudio;
     function loadSounds() {
         testAudio = new Audio("sounds\\Book_TurnPage_04.wav");
@@ -331,9 +412,10 @@ const drawBoard = function() {
         drawImgHexes(drawBoardStartPositionX, drawBoardStartPositionY);
     }
 
+    // Draws menu when loaded
     loadMenuAssets();
     menuImgArray[numMenuAssets - 1].onload = function () {
-        drawMenu(1);
+        drawMenu();
     }
 
     // Events
@@ -365,6 +447,7 @@ const drawBoard = function() {
         canvasEdgeScroll(e);
     }
 
+    // Scrolls the canvas right
     function scrollRight() {
         if (deltaX >= 0 && mousePosX < window.innerWidth && scrollDistX < canvasW - window.innerWidth) {
             posXCanvas -= 5;
@@ -377,6 +460,7 @@ const drawBoard = function() {
         }
     }
 
+    // Scrolls the canvas left
     function scrollLeft() {
         if (deltaX <= 0 && mousePosX > 0 && scrollDistX > 0) {
             posXCanvas += 5;
@@ -389,6 +473,7 @@ const drawBoard = function() {
         }
     }
 
+    // Scrolls the canvas up
     function scrollUp() {
         if (deltaY <= 0 && mousePosY > 0 && scrollDistY > 0) {
             posYCanvas += 3;
@@ -401,6 +486,7 @@ const drawBoard = function() {
         }
     }
 
+    // Scrolls the canvas down
     function scrollDown() {
         if (deltaY >= 0 && mousePosY < window.innerHeight && scrollDistY < canvasH - window.innerHeight) {
             posYCanvas -= 3;
@@ -413,13 +499,15 @@ const drawBoard = function() {
         }
     }
 
+    // Scrolls the canvas using mouse location
     function canvasEdgeScroll (e) {
         if (!scrolling) {
             mousePosX = e.clientX;
             mousePosY = e.clientY;
+            let detectionWidth = 50;
 
             if (canvasH - 100 > window.innerHeight) {
-                if (mousePosY < 100) {
+                if (mousePosY < detectionWidth) {
                     if (scrollDistY > 0) {
                         scrolling = true;
                         scrollUp();                         
@@ -432,11 +520,11 @@ const drawBoard = function() {
             }
     
             if (canvasW > innerWidth) {
-                if (mousePosX < 100) {
+                if (mousePosX < detectionWidth) {
                     scrolling = true;
                     scrollLeft();                    
                 }
-                else if (mousePosX > innerWidth - 100) {
+                else if (mousePosX > innerWidth - detectionWidth) {
                     scrolling = true;
                     scrollRight();
                 }
@@ -454,16 +542,13 @@ const drawBoard = function() {
         return y - (m * x);
     }
 
-    // Calculates hex hitboxes
+    // Calculates hitboxes on click
     function mouseHandlerHex(e) {
         mousePosX = e.clientX - canvasBounds.left;
         mousePosY = e.clientY - canvasBounds.top;
 
         let i = 0;
         let isClicked = false;
-        let hbound = false;
-        let vboundCheck = false;
-        let hboundCheck = false;
 
         // m holds slope and b holds the intercept
         var m, b;
@@ -472,23 +557,45 @@ const drawBoard = function() {
         if (mousePosY > innerHeight - 120) {
             // Middle button
             if (mousePosX > innerWidth / 2 - 60 && mousePosX < innerWidth / 2 + 60) {
-                buttonClickedId = 0;
-                player[1].ip = 1000;
-                drawMenu(buttonClickedId);
+                buttonClickedId = menuEnum.UNCLICKED;
+                drawImgHexes(posXCanvas, posYCanvas);
+                endTurn();
+                // drawMenu();
             }
             // Military menu button
             else if (mousePosX > innerWidth / 2 - 200 && mousePosX < innerWidth / 2 - 80) {
-                testAudio.play();
-                drawInfoMenu(1);
+                if (buttonClickedId == menuEnum.MILITARY) {
+                    drawImgHexes(posXCanvas, posYCanvas);
+                    buttonClickedId = menuEnum.UNCLICKED;
+                }
+                else {
+                    testAudio.play();
+                    buttonClickedId = menuEnum.MILITARY;
+                    drawInfoMenu(menuEnum.MILITARY);
+                }
             }
+            // Economy menu button
             else if (mousePosX > innerWidth / 2 + 80 && mousePosX < innerWidth / 2 + 200) {
-                testAudio.play();
-                drawInfoMenu(2);
+                if (buttonClickedId == menuEnum.ECONOMY) {
+                    drawImgHexes(posXCanvas, posYCanvas);
+                    buttonClickedId = menuEnum.UNCLICKED;
+                }
+                else {
+                    testAudio.play();
+                    buttonClickedId = menuEnum.ECONOMY;
+                    drawInfoMenu(menuEnum.ECONOMY);
+                }
             }
+        }
+        // Starting hex pop-up hitboxes (scuffed, but temorary.)
+        else if (currentTurn == 0 && !popUpClicked && (mousePosX > innerWidth / 2 - 40 && mousePosX < innerWidth / 2 + 40) && (mousePosY > innerHeight / 2 && mousePosY < innerHeight / 2 + 100)){
+            drawImgHexes(posXCanvas, posYCanvas);
+            popUpClicked = true;
         }
         else if (mousePosY < 26) {
             return;
         }
+        // Calculates hex hitboxes
         else {
             for (i = 0; i < numHexes * 3; i++) {
                 if (mousePosY > hexesPos[i][3] && mousePosY < hexesPos[i][11]) {
@@ -533,15 +640,29 @@ const drawBoard = function() {
                     if (isClicked) {
                         // For debugging/testing
                         console.log("This is hex #" + i + ".");
-                        console.log("Econ score: " + hexes[i].getEconScore())
+                        console.log("Econ score: " + hexes[i].econScore);
                         console.log("Resource given: " + hexes[i].getResource());
-                        addTerritory(0, i);
-                        console.log(player[0].getHexesControlled());
-                        // removeTerritory(0, i);
-                        // console.log(player[0].getHexesControlled());
-                        console.log("\n");
-                        selectedHex = i;
-                        drawImgHexes(posXCanvas, posYCanvas);
+                        console.log("Is controlled? " + hexes[i].isControlled);
+
+                        if (currentTurn == 0 && player[currentPlayer].hexesControlled.size == 0 && !hexes[i].isControlled) {
+                            // Should also add all of the hexes that border this hex here
+                            addTerritory(currentPlayer, i);
+                            hexes[i].isControlled = true;
+                            
+                            // Testing:
+                            console.log(player[currentPlayer].hexesControlled);
+                            console.log("\n");
+                            buttonClickedId = menuEnum.UNCLICKED;
+                            selectedHex = i;
+                            drawImgHexes(posXCanvas, posYCanvas);
+                            endTurn();
+                        } else {
+                            selectedHex = i;
+                            drawImgHexes(posXCanvas, posYCanvas);
+                            
+                            // In multiplayer there needs to be a player check here.
+                            drawInfoMenu(menuEnum.PRODUCTION);
+                        }
                     }
                 }
                 

@@ -1,4 +1,4 @@
-function Hex(hexType) {
+function Hex(hexType, originX, originY) {
     this.econScore = randEconScore();
     this.resourceGiven;
     this.resourceNum = hexType;
@@ -6,6 +6,12 @@ function Hex(hexType) {
     this.movementScore;
     this.defensiveScore;
     this.hasUnits = false;
+    this.units = [];
+    this.unitSum = new Array(numUnits);
+    this.unitSum.fill(0);
+    this.originX = originX;
+    this.originY = originY;
+    this.isControlled = false;
 
     switch(hexType) {
         case ResourceEnum.IRON:
@@ -36,9 +42,6 @@ function Hex(hexType) {
 
     this.defensiveScore = 1;
 
-    this.getEconScore = function() {
-        return this.econScore;
-    }
     this.getResource = function() {
         if (this.givesResources) {
             return this.resourceGiven;
@@ -47,19 +50,11 @@ function Hex(hexType) {
             return null;
         }
     }
-    this.getMovementScore = function() {
-        return this.movementScore;
-    }
-    this.getDefensiveScore = function() {
-        return this.defensiveScore;
-    }
-    this.isResourceHex = function() {
-        return this.givesResources;
-    }
-    this.getResourceNum = function() {
-        return this.resourceNum;
-    }
 
+    this.addUnit = function(unit) {
+        this.units.push(unit);
+        this.unitSum[unit.type]++;
+    }
 }
 
 // 50% chance of returning 2, 25% chance each of returning 1 and 3.

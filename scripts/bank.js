@@ -1,7 +1,9 @@
-const numResources = 7;
+const numResources = 6;
 var buyWeight = .5;
 var sellModifier = 1.15;
 function Bank() {
+    this.resourceInDemand = "None";
+
     this.resources = new Array(numResources);
 
     for (let i = 0; i < numResources; i++) {
@@ -13,6 +15,9 @@ function Bank() {
             this.resources[i].buyPrice = initialPrice + this.resources[i].numBought * buyWeight;
             this.resources[i].sellPrice = this.resources[i].buyPrice * sellModifier;
         }
+
+        // Update this when events system is built.
+        resourceInDemand = this.resources[0].typeString;
     }
 }
 
@@ -33,4 +38,32 @@ function Resource(resourceType) {
 
     // The number of resources sold by players this turn
     this.numSold = 0;
+
+    // String representing this resource
+    this.typeString = getTypeString(resourceType);
+}
+
+function getTypeString(type) {
+    switch(type) {
+        case ResourceEnum.IRON:
+            return resourceGiven = 'Iron Ore';
+            break;
+        case ResourceEnum.JEWEL:
+            return resourceGiven = 'Jewels';
+            break;
+        case ResourceEnum.LEATHER:
+            return resourceGiven = 'Leather';
+            break;
+        case ResourceEnum.SPICE:
+            return resourceGiven = 'Spices';
+            break;
+        case ResourceEnum.STONE:
+            return resourceGiven = 'Stone';
+            break;
+        case ResourceEnum.WOOD:
+            return resourceGiven = 'Wood';
+            break;
+        default:
+            break;
+    }
 }
