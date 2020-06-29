@@ -12,6 +12,7 @@ function Hex(hexType, originX, originY) {
     this.originX = originX;
     this.originY = originY;
     this.isControlled = false;
+    this.controllingPlayer;
 
     switch(hexType) {
         case ResourceEnum.IRON:
