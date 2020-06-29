@@ -8,9 +8,9 @@ var initializedMenu = false;
 var selectedHex = null;
 var drawBoardStartPositionX = 225;
 var drawBoardStartPositionY = 106;
-var buttonClickedId = null;
-var popUpClicked = false;
 const menuEnum = Object.freeze({"UNCLICKED" : 0, "ENDTURN" : 1, "MILITARY" : 2, "ECONOMY" : 3, "PRODUCTION" : 4});
+var buttonClickedId = menuEnum.UNCLICKED;
+var popUpClicked = false;
 
 // Gets a random int from 0 to max - 1.
 function getRandomInt(max) {
@@ -275,6 +275,10 @@ const drawBoard = function() {
         // Remove these after menus can be closed
         drawStats();
         drawMenu();
+
+        if (buttonClickedId != menuEnum.UNCLICKED) {
+            drawInfoMenu(buttonClickedId);
+        }
     }
 
     // Load menu assets
