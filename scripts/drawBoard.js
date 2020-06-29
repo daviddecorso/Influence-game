@@ -192,6 +192,9 @@ const drawBoard = function() {
 
         boardCtx.clearRect(0, 0, canvasW, canvasH);
 
+        boardCtx.fillStyle = '#008aae';
+        boardCtx.fillRect(0, 0, canvasW, canvasH);
+
         posX += 82;
         count += drawLineOfHexes(posX, posY, 5, count);
         
@@ -363,7 +366,16 @@ const drawBoard = function() {
             default:
                 break;
         }
+
+        menuCtx.fillStyle = 'black';
+        menuCtx.font = '36px sans-serif';
+        menuCtx.fillText("EXIT", innerWidth / 2 - 45, innerHeight / 2 + 200);
+
+        menuCtx.lineWidth = 2
+        menuCtx.strokeStyle = 'black';
+        menuCtx.strokeRect(innerWidth / 2 - 50, innerHeight / 2 + 165, 90, 45);
     }
+    
 
     // Draws pop up that instructs users to select their starting hex
     this.drawCapitalInfo = function () {
@@ -592,6 +604,11 @@ const drawBoard = function() {
             drawImgHexes(posXCanvas, posYCanvas);
             popUpClicked = true;
         }
+        // Closes info menus
+        else if (buttonClickedId != menuEnum.UNCLICKED && (mousePosX > innerWidth / 2 - 50 && mousePosX < innerWidth / 2 + 40) && (mousePosY > innerHeight / 2 + 165 && mousePosY < innerHeight / 2 + 210)) {
+            buttonClickedId = menuEnum.UNCLICKED;
+            drawImgHexes(posXCanvas, posYCanvas);
+        }
         else if (mousePosY < 26) {
             return;
         }
@@ -644,10 +661,12 @@ const drawBoard = function() {
                         console.log("Resource given: " + hexes[i].getResource());
                         console.log("Is controlled? " + hexes[i].isControlled);
 
+                        // Adds territory to a player, should make this its own function
                         if (currentTurn == 0 && player[currentPlayer].hexesControlled.size == 0 && !hexes[i].isControlled) {
                             // Should also add all of the hexes that border this hex here
                             addTerritory(currentPlayer, i);
                             hexes[i].isControlled = true;
+                            hexes[i].controllingPlayer = currentPlayer;
                             
                             // Testing:
                             console.log(player[currentPlayer].hexesControlled);
@@ -656,12 +675,19 @@ const drawBoard = function() {
                             selectedHex = i;
                             drawImgHexes(posXCanvas, posYCanvas);
                             endTurn();
-                        } else {
+                        }
+                        // Opens the production menu
+                        else if (hexes[i].isControlled && hexes[i].controllingPlayer == currentPlayer){
                             selectedHex = i;
                             drawImgHexes(posXCanvas, posYCanvas);
                             
                             // In multiplayer there needs to be a player check here.
+                            buttonClickedId = menuEnum.PRODUCTION;
                             drawInfoMenu(menuEnum.PRODUCTION);
+                        }
+                        else {
+                            selectedHex = i;
+                            drawImgHexes(posXCanvas, posYCanvas);
                         }
                     }
                 }
