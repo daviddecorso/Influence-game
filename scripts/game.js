@@ -1,10 +1,10 @@
 var numPlayers = 4
 
 var bank = new Bank();
-var player = new Array(numPlayers);
+var players = new Array(numPlayers);
 
 for (let i = 0; i < numPlayers; i++) {
-    player[i] = new Player();
+    players[i] = new Player();
 }
 
 /*
