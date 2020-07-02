@@ -8,8 +8,8 @@ var initializedMenu = false;
 var selectedHex = null;
 var drawBoardStartPositionX = 225;
 var drawBoardStartPositionY = 106;
-const menuEnum = Object.freeze({"UNCLICKED" : 0, "ENDTURN" : 1, "MILITARY" : 2, "ECONOMY" : 3, "PRODUCTION" : 4});
-var buttonClickedId = menuEnum.UNCLICKED;
+const menuEnum = Object.freeze({"UNCLICKED" : 0, "ENDTURN" : 1, "MILITARY" : 2, "ECONOMY" : 3, "PRODUCTION" : 4, "GLOBAL_EVENT" : 5, "NATL_EVENT" : 6});
+var menuId = menuEnum.UNCLICKED;
 var popUpClicked = false;
 
 // Gets a random int from 0 to max - 1.
@@ -276,8 +276,8 @@ const drawBoard = function() {
         drawStats();
         drawMenu();
 
-        if (buttonClickedId != menuEnum.UNCLICKED) {
-            drawInfoMenu(buttonClickedId);
+        if (menuId != menuEnum.UNCLICKED) {
+            drawInfoMenu(menuId);
         }
     }
 
@@ -307,7 +307,9 @@ const drawBoard = function() {
     }
 
     // Draws the menus that pop up in the middle of the screen (military, production, economy, etc.)
-    function drawInfoMenu(menuType) {
+    let drawExit = true;
+    this.drawInfoMenu = function(menuType) {
+        drawExit = true;
         menuCtx.clearRect;
         menuCtx.fillStyle = 'grey';
         menuCtx.fillRect(innerWidth / 2 - 250, innerHeight / 2 - 350, 500, 600);
@@ -317,24 +319,27 @@ const drawBoard = function() {
             case menuEnum.MILITARY:
                 menuCtx.fillStyle = 'black';
                 menuCtx.font = '36px sans-serif';
-                menuCtx.fillText("MILITARY OVERVIEW:", innerWidth / 2 - 195, innerHeight / 2 - 305);
+                menuCtx.textAlign = 'center';
+                menuCtx.fillText("MILITARY OVERVIEW:", innerWidth / 2, innerHeight / 2 - 305);
 
                 menuCtx.font = '24px sans-serif';
-                menuCtx.fillText("Total: Soldiers: Archers: Cavalry: ", innerWidth / 2 - 195, innerHeight / 2 - 260);
+                menuCtx.fillText("Total: " + players[currentPlayer].totalUnits +" Soldiers: Archers: Cavalry: ", innerWidth / 2, innerHeight / 2 - 260);
 
                 let militaryMenuString = "";
                 let hexTotalUnits = 0;
                 let militaryMenuTextPosX = innerWidth / 2 - 230, militaryMenuTextPosY = innerHeight / 2 - 225;
-                for (let hex of player[currentPlayer].hexesControlled) {
+                for (let hex of players[currentPlayer].hexesControlled) {
                     if (hexes[hex].units.length > 0) {
                         for (let i = 0; i < hexes[hex].unitSum.length; i++) {
                             hexTotalUnits += hexes[hex].unitSum[i];
                         }
                         militaryMenuString += "Hex " + hex + ": Total: " + hexTotalUnits + ", Soldiers: " + hexes[hex].unitSum[0] + ", Archers: " + hexes[hex].unitSum[1] + ", Cavalry " + hexes[hex].unitSum[2];
                         menuCtx.font = '20px sans-serif';
+                        menuCtx.textAlign = 'left';
                         menuCtx.fillText(militaryMenuString, militaryMenuTextPosX, militaryMenuTextPosY);
                         militaryMenuTextPosY += 30;
                         militaryMenuString = "";
+                        hexTotalUnits = 0;
                     }
                 }
                 break;
@@ -342,12 +347,13 @@ const drawBoard = function() {
             case menuEnum.ECONOMY:
                 menuCtx.fillStyle = 'black';
                 menuCtx.font = '36px sans-serif';
+                menuCtx.textAlign = 'center';
 
-                menuCtx.fillText("MARKET:", innerWidth / 2 - 80, innerHeight / 2 - 305);
+                menuCtx.fillText("MARKET:", innerWidth / 2, innerHeight / 2 - 305);
 
                 let demandString = "Resource in demand: " + bank.resourceInDemand;
                 menuCtx.font = '28px sans-serif';
-                menuCtx.fillText(demandString, innerWidth / 2 - 230, innerHeight / 2 - 260);
+                menuCtx.fillText(demandString, innerWidth / 2, innerHeight / 2 - 260);
 
                 let econMenuString = "";
                 let econMenuTextPosX = innerWidth / 2 - 230, econMenuTextPosY = innerHeight / 2 - 210;
@@ -355,6 +361,7 @@ const drawBoard = function() {
                     econMenuString += bank.resources[i].typeString + ": " + bank.resources[i].buyPrice + "s/" + bank.resources[i].sellPrice + "b " 
 
                     menuCtx.font = '24px sans-serif';
+                    menuCtx.textAlign = 'left';
                     menuCtx.fillText(econMenuString, econMenuTextPosX, econMenuTextPosY);
                     econMenuTextPosY += 50;
                     econMenuString = "";
@@ -364,22 +371,56 @@ const drawBoard = function() {
             case menuEnum.PRODUCTION:
                 menuCtx.fillStyle = 'black';
                 menuCtx.font = '36px sans-serif';
-                menuCtx.fillText("PRODUCTION:", innerWidth / 2 - 135, innerHeight / 2 - 305);
+                menuCtx.textAlign = 'center';
+                menuCtx.fillText("PRODUCTION:", innerWidth / 2, innerHeight / 2 - 305);
                 break;
+
+            case menuEnum.GLOBAL_EVENT:
+                menuCtx.fillStyle = 'black';
+                menuCtx.font = '36px sans-serif';
+                menuCtx.textAlign = 'center';
+                menuCtx.fillText(GlobalEvents[globalEvent].name, innerWidth / 2, innerHeight / 2 - 305);
+                menuCtx.font = '24px sans-serif';
+                menuCtx.fillText(GlobalEvents[globalEvent].textContent, innerWidth / 2, innerHeight / 2 - 250);
+                menuCtx.font = '28px sans-serif';
+                menuCtx.fillText(GlobalEvents[globalEvent].effect, innerWidth / 2, innerHeight / 2 - 100)
+                menuCtx.fillText("Turns remaining: " + globalEventCounter, innerWidth / 2, innerHeight / 2);
+                break;
+
+            case menuEnum.NATL_EVENT:
+                menuCtx.fillStyle = 'black';
+                menuCtx.font = '36px sans-serif';
+                menuCtx.textAlign = 'center';
+                menuCtx.fillText(NatlEvents[natlEvent].name, innerWidth / 2, innerHeight / 2 - 305);
+                menuCtx.font = '24px sans-serif';
+                menuCtx.fillText(NatlEvents[natlEvent].textContent, innerWidth / 2, innerHeight / 2 - 250);
+                menuCtx.font = '28px sans-serif';
+                menuCtx.fillText(NatlEvents[natlEvent].effect, innerWidth / 2, innerHeight / 2 - 100)
+                menuCtx.fillText("Do you spend the points?", innerWidth / 2, innerHeight / 2);
+                drawExit = false;
+                break;    
 
             default:
                 break;
         }
 
+        // Draws pop up buttons
         menuCtx.fillStyle = 'black';
         menuCtx.font = '36px sans-serif';
-        menuCtx.fillText("EXIT", innerWidth / 2 - 45, innerHeight / 2 + 200);
-
+        menuCtx.textAlign = 'center';
         menuCtx.lineWidth = 2
         menuCtx.strokeStyle = 'black';
-        menuCtx.strokeRect(innerWidth / 2 - 50, innerHeight / 2 + 165, 90, 45);
+        if (drawExit) {
+            menuCtx.fillText("EXIT", innerWidth / 2, innerHeight / 2 + 200);
+            menuCtx.strokeRect(innerWidth / 2 - 50, innerHeight / 2 + 165, 100, 45);
+        }
+        else if (!drawExit) {
+            menuCtx.fillText("Yes\t\t\t\tNo", innerWidth / 2, innerHeight / 2 + 200);
+            menuCtx.strokeRect(innerWidth / 2 - 80, innerHeight / 2 + 165, 75, 45);
+            menuCtx.strokeRect(innerWidth / 2 + 20, innerHeight / 2 + 165, 65, 45);
+        }
+        
     }
-    
 
     // Draws pop up that instructs users to select their starting hex
     this.drawCapitalInfo = function () {
@@ -390,8 +431,9 @@ const drawBoard = function() {
 
         menuCtx.fillStyle = 'black';
         menuCtx.font = '48px sans-serif';
-        menuCtx.fillText("Select your starting hex on the map:", innerWidth / 2 - 400 + 15, innerHeight / 2);
-        menuCtx.fillText("Ok", innerWidth / 2 - 40, innerHeight / 2 + 70);
+        menuCtx.textAlign = 'center';
+        menuCtx.fillText("Select your starting hex on the map:", innerWidth / 2, innerHeight / 2);
+        menuCtx.fillText("Ok", innerWidth / 2, innerHeight / 2 + 70);
     }
 
     // Draws units to the board (design is temporary)
@@ -573,32 +615,32 @@ const drawBoard = function() {
         if (mousePosY > innerHeight - 120) {
             // Middle button
             if (mousePosX > innerWidth / 2 - 60 && mousePosX < innerWidth / 2 + 60) {
-                buttonClickedId = menuEnum.UNCLICKED;
+                menuId = menuEnum.UNCLICKED;
                 drawImgHexes(posXCanvas, posYCanvas);
                 endTurn();
                 // drawMenu();
             }
             // Military menu button
             else if (mousePosX > innerWidth / 2 - 200 && mousePosX < innerWidth / 2 - 80) {
-                if (buttonClickedId == menuEnum.MILITARY) {
+                if (menuId == menuEnum.MILITARY) {
                     drawImgHexes(posXCanvas, posYCanvas);
-                    buttonClickedId = menuEnum.UNCLICKED;
+                    menuId = menuEnum.UNCLICKED;
                 }
                 else {
                     testAudio.play();
-                    buttonClickedId = menuEnum.MILITARY;
+                    menuId = menuEnum.MILITARY;
                     drawInfoMenu(menuEnum.MILITARY);
                 }
             }
             // Economy menu button
             else if (mousePosX > innerWidth / 2 + 80 && mousePosX < innerWidth / 2 + 200) {
-                if (buttonClickedId == menuEnum.ECONOMY) {
+                if (menuId == menuEnum.ECONOMY) {
                     drawImgHexes(posXCanvas, posYCanvas);
-                    buttonClickedId = menuEnum.UNCLICKED;
+                    menuId = menuEnum.UNCLICKED;
                 }
                 else {
                     testAudio.play();
-                    buttonClickedId = menuEnum.ECONOMY;
+                    menuId = menuEnum.ECONOMY;
                     drawInfoMenu(menuEnum.ECONOMY);
                 }
             }
@@ -609,8 +651,23 @@ const drawBoard = function() {
             popUpClicked = true;
         }
         // Closes info menus
-        else if (buttonClickedId != menuEnum.UNCLICKED && (mousePosX > innerWidth / 2 - 50 && mousePosX < innerWidth / 2 + 40) && (mousePosY > innerHeight / 2 + 165 && mousePosY < innerHeight / 2 + 210)) {
-            buttonClickedId = menuEnum.UNCLICKED;
+        else if (drawExit && menuId != menuEnum.UNCLICKED && (mousePosX > innerWidth / 2 - 50 && mousePosX < innerWidth / 2 + 40) && (mousePosY > innerHeight / 2 + 165 && mousePosY < innerHeight / 2 + 210)) {
+            menuId = menuEnum.UNCLICKED;
+            drawImgHexes(posXCanvas, posYCanvas);
+        }
+        // Hitbox for yes button
+        else if (!drawExit && (mousePosX > innerWidth / 2 - 80 && mousePosX < innerWidth / 2 - 5) && (mousePosY > innerHeight / 2 + 165 && mousePosY < innerWidth / 2 + 210)) {
+            runNationalEvent(true);
+            menuID = menuEnum.UNCLICKED;
+            drawExit = true;
+            drawImgHexes(posXCanvas, posYCanvas);
+        }
+        // Hitbox for no button
+        else if (!drawExit && (mousePosX > innerWidth / 2 + 20 && mousePosX < innerWidth / 2 + 85) && (mousePosY > innerHeight / 2 + 165 && mousePosY < innerWidth / 2 + 210)) {
+            runNationalEvent(false);
+            menuID = menuEnum.UNCLICKED;
+            drawExit = true;
+
             drawImgHexes(posXCanvas, posYCanvas);
         }
         else if (mousePosY < 26) {
@@ -666,31 +723,30 @@ const drawBoard = function() {
                         console.log("Is controlled? " + hexes[i].isControlled);
 
                         // Adds territory to a player, should make this its own function
-                        if (currentTurn == 0 && player[currentPlayer].hexesControlled.size == 0 && !hexes[i].isControlled) {
+                        if (currentTurn == 0 && players[currentPlayer].hexesControlled.size == 0 && !hexes[i].isControlled) {
                             // Should also add all of the hexes that border this hex here
                             addTerritory(currentPlayer, i);
-                            hexes[i].isControlled = true;
-                            hexes[i].controllingPlayer = currentPlayer;
                             
                             // Testing:
-                            console.log(player[currentPlayer].hexesControlled);
+                            console.log(players[currentPlayer].hexesControlled);
                             console.log("\n");
-                            buttonClickedId = menuEnum.UNCLICKED;
+                            menuId = menuEnum.UNCLICKED;
                             selectedHex = i;
                             drawImgHexes(posXCanvas, posYCanvas);
                             endTurn();
                         }
                         // Opens the production menu
-                        else if (hexes[i].isControlled && hexes[i].controllingPlayer == currentPlayer){
+                        else if (hexes[i].isControlled && hexes[i].controllingPlayer == currentPlayer) {
                             selectedHex = i;
                             drawImgHexes(posXCanvas, posYCanvas);
                             
                             // In multiplayer there needs to be a player check here.
-                            buttonClickedId = menuEnum.PRODUCTION;
+                            menuId = menuEnum.PRODUCTION;
                             drawInfoMenu(menuEnum.PRODUCTION);
                         }
                         else {
                             selectedHex = i;
+                            menuID = menuEnum.UNCLICKED;
                             drawImgHexes(posXCanvas, posYCanvas);
                         }
                     }

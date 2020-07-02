@@ -44,6 +44,8 @@ function turn() {
     giveResources(currentPlayer);
 
     // Events manager
+    eventManager();
+    console.log("EVENT: " + GlobalEvents[globalEvent].name + " TURNS LEFT: " + globalEventCounter);
 
     // Start the 2nd half of the turn
 
@@ -67,7 +69,7 @@ function endTurn() {
 
 function checkHighestIP() {
     for (let i = 0; i < numPlayers; i++) {
-        highestIP = Math.max(highestIP, player[i].ip);
+        highestIP = Math.max(highestIP, players[i].ip);
     }
 
     if (highestIP < 1000) {
@@ -80,9 +82,9 @@ function gameOver() {
 }
 
 function giveResources(playerNum) {
-    for (let hex of player[playerNum].hexesControlled) {
+    for (let hex of players[playerNum].hexesControlled) {
         if(hexes[hex].givesResources) {
-            player[playerNum].numPlayerResources[hexes[hex].resourceNum] += hexes[hex].econScore;
+            players[playerNum].numPlayerResources[hexes[hex].resourceNum] += hexes[hex].econScore;
         }
         /*
         // Debug:
@@ -94,9 +96,11 @@ function giveResources(playerNum) {
 }
 
 function addTerritory(playerNum, hexNum) {
-    player[playerNum].addHex(hexNum);
+    players[playerNum].addHex(hexNum);
+    hexes[hexNum].isControlled = true;
+    hexes[hexNum].controllingPlayer = playerNum;
 }
 
 function removeTerritory(playerNum, hexNum) {
-    player[playerNum].removeHex(hexNum);
+    players[playerNum].removeHex(hexNum);
 }

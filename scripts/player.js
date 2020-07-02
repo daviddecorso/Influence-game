@@ -9,6 +9,8 @@ function Player() {
         this.numPlayerResources[i] = 0;
     }
 
+    this.totalUnits = 0;
+
     // Influence points
     this.ip = 0;
 

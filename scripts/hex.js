@@ -55,6 +55,7 @@ function Hex(hexType, originX, originY) {
     this.addUnit = function(unit) {
         this.units.push(unit);
         this.unitSum[unit.type]++;
+        players[this.controllingPlayer].totalUnits++;
     }
 }
 

@@ -1,8 +1,9 @@
 const numResources = 6;
-var buyWeight = .5;
-var sellModifier = 1.15;
+const buyWeight = .5;
+const sellModifier = 1.15;
+const demandModifier = 1.20;
 function Bank() {
-    this.resourceInDemand = "None";
+    this.resourceInDemand = -1;
 
     this.resources = new Array(numResources);
 
@@ -16,8 +17,11 @@ function Bank() {
             this.resources[i].sellPrice = this.resources[i].buyPrice * sellModifier;
         }
 
-        // Update this when events system is built.
-        resourceInDemand = this.resources[0].typeString;
+        // Updates resource in demand
+        if (this.resourceInDemand != -1) {
+            this.resources[this.resourceInDemand].buyPrice *= demandModifier;
+            this.resources[this.resourceInDemand].sellPrice *= demandModifier;
+        }
     }
 }
 
