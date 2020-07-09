@@ -1,10 +1,19 @@
-var numPlayers = 4
+/**
+ * Number of players in the game
+ */
+var numPlayers = 4;
 
+/**
+ * Initializes and stores the bank
+ */
 var bank = new Bank();
-var players = new Array(numPlayers);
 
+/**
+ * Initializes and stores the array of player objects
+ */
+var players = new Array(numPlayers);
 for (let i = 0; i < numPlayers; i++) {
-    players[i] = new Player();
+  players[i] = new Player();
 }
 
 /*
@@ -12,8 +21,18 @@ for (let i = 0; i < numPlayers; i++) {
     (Also will have a starting menu)
 */
 
+/**
+ * Current turn
+ */
 var currentTurn = 0;
+
+/**
+ * Highest IP
+ */
 var highestIP = 0;
 
+// Draw the board.
 drawBoard();
+
+// Starts the turn loop.
 turn();

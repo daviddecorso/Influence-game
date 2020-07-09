@@ -1,73 +1,117 @@
+/**
+ * Number of resources in the game
+ */
 const numResources = 6;
-const buyWeight = .5;
+
+/**
+ * Controls how much prices increase in response to demand.
+ */
+const buyWeight = 0.5;
+
+/**
+ * Controls the difference between the buy price and the sell price.
+ */
 const sellModifier = 1.15;
-const demandModifier = 1.20;
+
+/**
+ * Controls how much prices increase when they are "in demand" (from events).
+ */
+const demandModifier = 1.2;
+
+/**
+ * Stores array of resources and corresponding prices.
+ * @constructor
+ */
 function Bank() {
-    this.resourceInDemand = -1;
+  this.resourceInDemand = -1;
 
-    this.resources = new Array(numResources);
+  this.resources = new Array(numResources);
 
+  for (let i = 0; i < numResources; i++) {
+    this.resources[i] = new Resource(i);
+  }
+
+  /**
+   * Updates prices based on demand and "in demand" status.
+   */
+  this.updatePrices = function () {
     for (let i = 0; i < numResources; i++) {
-        this.resources[i] = new Resource(i);
+      this.resources[i].buyPrice =
+        initialPrice + this.resources[i].numBought * buyWeight;
+      this.resources[i].sellPrice = this.resources[i].buyPrice * sellModifier;
     }
 
-    this.updatePrices = function() {
-        for (let i = 0; i < numResources; i++) {
-            this.resources[i].buyPrice = initialPrice + this.resources[i].numBought * buyWeight;
-            this.resources[i].sellPrice = this.resources[i].buyPrice * sellModifier;
-        }
-
-        // Updates resource in demand
-        if (this.resourceInDemand != -1) {
-            this.resources[this.resourceInDemand].buyPrice *= demandModifier;
-            this.resources[this.resourceInDemand].sellPrice *= demandModifier;
-        }
+    // Updates resource in demand
+    if (this.resourceInDemand != -1) {
+      this.resources[this.resourceInDemand].buyPrice *= demandModifier;
+      this.resources[this.resourceInDemand].sellPrice *= demandModifier;
     }
+  };
 }
 
-const ResourceEnum = Object.freeze({"IRON" : 0, "JEWEL" : 1, "LEATHER" : 2, "SPICE" : 3,  "STONE" : 4, "WOOD" : 5});
+/**
+ * Enum for resource types
+ */
+const ResourceEnum = Object.freeze({
+  IRON: 0,
+  JEWEL: 1,
+  LEATHER: 2,
+  SPICE: 3,
+  STONE: 4,
+  WOOD: 5,
+});
 var initialPrice = 10;
+
+/**
+ * Resource object
+ * @constructor
+ * @param {number} resourceType - Type of resource
+ */
 function Resource(resourceType) {
-    // The bank buys resources for this price
-    this.buyPrice = initialPrice;
+  // The bank buys resources for this price
+  this.buyPrice = initialPrice;
 
-    // The bank sells resources for this price
-    this.sellPrice = initialPrice * sellModifier;
+  // The bank sells resources for this price
+  this.sellPrice = initialPrice * sellModifier;
 
-    // Resource type
-    this.type = resourceType;
+  // Resource type
+  this.type = resourceType;
 
-    // The number of resources bought by players this turn
-    this.numBought = 0;
+  // The number of resources bought by players this turn
+  this.numBought = 0;
 
-    // The number of resources sold by players this turn
-    this.numSold = 0;
+  // The number of resources sold by players this turn
+  this.numSold = 0;
 
-    // String representing this resource
-    this.typeString = getTypeString(resourceType);
+  // String representing this resource
+  this.typeString = getTypeString(resourceType);
 }
 
+/**
+ *
+ * @param {number} type - Resource type
+ */
 function getTypeString(type) {
-    switch(type) {
-        case ResourceEnum.IRON:
-            return resourceGiven = 'Iron Ore';
-            break;
-        case ResourceEnum.JEWEL:
-            return resourceGiven = 'Jewels';
-            break;
-        case ResourceEnum.LEATHER:
-            return resourceGiven = 'Leather';
-            break;
-        case ResourceEnum.SPICE:
-            return resourceGiven = 'Spices';
-            break;
-        case ResourceEnum.STONE:
-            return resourceGiven = 'Stone';
-            break;
-        case ResourceEnum.WOOD:
-            return resourceGiven = 'Wood';
-            break;
-        default:
-            break;
-    }
+  switch (type) {
+    case ResourceEnum.IRON:
+      return (resourceGiven = "Iron Ore");
+      break;
+    case ResourceEnum.JEWEL:
+      return (resourceGiven = "Jewels");
+      break;
+    case ResourceEnum.LEATHER:
+      return (resourceGiven = "Leather");
+      break;
+    case ResourceEnum.SPICE:
+      return (resourceGiven = "Spices");
+      break;
+    case ResourceEnum.STONE:
+      return (resourceGiven = "Stone");
+      break;
+    case ResourceEnum.WOOD:
+      return (resourceGiven = "Wood");
+      break;
+    default:
+      break;
+  }
 }
