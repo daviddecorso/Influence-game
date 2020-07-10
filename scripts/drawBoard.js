@@ -987,7 +987,7 @@ const drawBoard = function () {
       return;
     }
     // Calculates hex hitboxes
-    else {
+    else if (menuId == menuEnum.UNCLICKED) {
       for (i = 0; i < numHexes * 3; i++) {
         if (mousePosY > hexesPos[i][3] && mousePosY < hexesPos[i][11]) {
           if (mousePosX > hexesPos[i][2]) {
