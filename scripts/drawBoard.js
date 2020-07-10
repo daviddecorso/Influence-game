@@ -550,9 +550,9 @@ const drawBoard = function () {
             bank.resources[i].typeString +
             ": " +
             bank.resources[i].buyPrice +
-            "s/" +
+            "b/" +
             bank.resources[i].sellPrice +
-            "b ";
+            "s ";
 
           menuCtx.font = "24px sans-serif";
           menuCtx.textAlign = "left";

@@ -11,7 +11,7 @@ const buyWeight = 0.5;
 /**
  * Controls the difference between the buy price and the sell price.
  */
-const sellModifier = 1.15;
+const buyModifier = 1.15;
 
 /**
  * Controls how much prices increase when they are "in demand" (from events).
@@ -35,16 +35,17 @@ function Bank() {
    * Updates prices based on demand and "in demand" status.
    */
   this.updatePrices = function () {
+    // Determines the buy and sell prices for resources based on their demand.
     for (let i = 0; i < numResources; i++) {
-      this.resources[i].buyPrice =
+      this.resources[i].sellPrice =
         initialPrice + this.resources[i].numBought * buyWeight;
-      this.resources[i].sellPrice = this.resources[i].buyPrice * sellModifier;
+      this.resources[i].buyPrice = this.resources[i].sellPrice * buyModifier;
     }
 
     // Updates resource in demand
     if (this.resourceInDemand != -1) {
-      this.resources[this.resourceInDemand].buyPrice *= demandModifier;
       this.resources[this.resourceInDemand].sellPrice *= demandModifier;
+      this.resources[this.resourceInDemand].buyPrice *= demandModifier;
     }
   };
 }
@@ -68,28 +69,41 @@ var initialPrice = 10;
  * @param {number} resourceType - Type of resource
  */
 function Resource(resourceType) {
-  // The bank buys resources for this price
-  this.buyPrice = initialPrice;
+  /**
+   * The player sells resources for this price
+   */
+  this.sellPrice = initialPrice;
 
-  // The bank sells resources for this price
-  this.sellPrice = initialPrice * sellModifier;
+  /**
+   * The player buys resources for this price
+   */
+  this.buyPrice = initialPrice * buyModifier;
 
-  // Resource type
+  /**
+   * Resource type
+   */
   this.type = resourceType;
 
-  // The number of resources bought by players this turn
+  /**
+   * The number of this resource bought by players this turn
+   */
   this.numBought = 0;
 
-  // The number of resources sold by players this turn
+  /**
+   * The number of this resource sold by players this turn
+   */
   this.numSold = 0;
 
-  // String representing this resource
+  /**
+   * String representing this resource
+   */
   this.typeString = getTypeString(resourceType);
 }
 
 /**
- *
+ * Returns a string value for the resource.
  * @param {number} type - Resource type
+ * @returns {string} resourceGiven - String representing the resource.
  */
 function getTypeString(type) {
   switch (type) {
