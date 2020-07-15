@@ -8,12 +8,12 @@ const globalModifierEnum = Object.freeze({
 });
 
 /**
- * Types of global event modifiers
+ * Types of national event modifiers
  */
 const natlModifierEnum = Object.freeze({ UPRISING: 0 });
 
 /**
- * Total number of global events
+ * Total number of national events
  */
 const numGlobalEvents = 3;
 

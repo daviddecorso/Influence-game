@@ -1,33 +1,50 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <meta charset="utf-8" />
-        <title>Influence</title>
-    </head>
-    <style>
-        * { padding: 0; margin: 0; }
-        canvas { position: absolute; }
-        #spashScreen { z-index: 3; }
-        #topBarCanvas { z-index: 2; }
-        #bottomMenuCanvas { z-index: 2; }
-        #boardCanvas { z-index: 1; }
-        html, body { overflow: hidden; }
-    </style>
-    <body>
-        <div id="game">
-            <canvas id="splashScreen"></canvas>
-            <canvas id="topBarCanvas"></canvas>
-            <canvas id="bottomMenuCanvas"></canvas>
-            <canvas id="boardCanvas"></canvas>
-        </div>
-        <script src="scripts/unit.js"></script>
-        <script src="scripts/hex.js"></script>
-        <script src="scripts/player.js"></script>
-        <script src="scripts/bank.js"></script>
-        <script src="scripts/eventContent.js"></script>
-        <script src="scripts/events.js"></script>
-        <script src="scripts/turn.js"></script>
-        <script src="scripts/drawBoard.js"></script>
-        <script src="scripts/game.js"></script>
-    </body>
+  <head>
+    <meta charset="utf-8" />
+    <title>Influence</title>
+  </head>
+  <style>
+    * {
+      padding: 0;
+      margin: 0;
+    }
+    canvas {
+      position: absolute;
+    }
+    #spashScreen {
+      z-index: 3;
+    }
+    #topBarCanvas {
+      z-index: 2;
+    }
+    #bottomMenuCanvas {
+      z-index: 2;
+    }
+    #boardCanvas {
+      z-index: 1;
+    }
+    html,
+    body {
+      overflow: hidden;
+    }
+  </style>
+  <body>
+    <div id="game">
+      <canvas id="splashScreen"></canvas>
+      <canvas id="topBarCanvas"></canvas>
+      <canvas id="bottomMenuCanvas"></canvas>
+      <canvas id="boardCanvas"></canvas>
+    </div>
+    <script src="scripts/structure.js"></script>
+    <script src="scripts/unit.js"></script>
+    <script src="scripts/hex.js"></script>
+    <script src="scripts/player.js"></script>
+    <script src="scripts/bank.js"></script>
+    <script src="scripts/eventContent.js"></script>
+    <script src="scripts/events.js"></script>
+    <script src="scripts/turn.js"></script>
+    <script src="scripts/drawBoard.js"></script>
+    <script src="scripts/game.js"></script>
+  </body>
 </html>

@@ -21,6 +21,26 @@ var hexWidth = 82;
 var hexHeight = 71;
 
 /**
+ * Background menu color
+ */
+var bgMenuColor = "#0A1529";
+
+/**
+ * Menu text color
+ */
+var menuTextColor = "#D0A85E";
+
+/**
+ * Border color
+ */
+var borderColor = "#502C1D";
+
+/**
+ * Accent blue color
+ */
+var accentBlue = "#02ABD0";
+
+/**
  * Array that stores all the hex objects on the board
  */
 var hexes = new Array(300);
@@ -471,14 +491,27 @@ const drawBoard = function () {
   this.drawInfoMenu = function (menuType) {
     drawExit = true;
     menuCtx.clearRect;
-    menuCtx.fillStyle = "grey";
+
+    // Draw menu background
+    menuCtx.fillStyle = bgMenuColor;
     menuCtx.fillRect(innerWidth / 2 - 250, innerHeight / 2 - 350, 500, 600);
+
+    // Draw menu outline
+    menuCtx.beginPath();
+    menuCtx.moveTo(innerWidth / 2 - 250, innerHeight / 2 - 350);
+    menuCtx.lineTo(innerWidth / 2 + 250, innerHeight / 2 - 350);
+    menuCtx.lineTo(innerWidth / 2 + 250, innerHeight / 2 + 250);
+    menuCtx.lineTo(innerWidth / 2 - 250, innerHeight / 2 + 250);
+    menuCtx.lineTo(innerWidth / 2 - 250, innerHeight / 2 - 350);
+    menuCtx.lineWidth = 3;
+    menuCtx.strokeStyle = borderColor;
+    menuCtx.stroke();
 
     // Draws info to the menu based on menu type
     switch (menuType) {
       case menuEnum.MILITARY:
-        menuCtx.fillStyle = "black";
-        menuCtx.font = "36px sans-serif";
+        menuCtx.fillStyle = menuTextColor;
+        menuCtx.font = "36px times-new-roman";
         menuCtx.textAlign = "center";
         menuCtx.fillText(
           "MILITARY OVERVIEW:",
@@ -532,8 +565,8 @@ const drawBoard = function () {
         break;
 
       case menuEnum.ECONOMY:
-        menuCtx.fillStyle = "black";
-        menuCtx.font = "36px sans-serif";
+        menuCtx.fillStyle = menuTextColor;
+        menuCtx.font = "36px times-new-roman";
         menuCtx.textAlign = "center";
 
         menuCtx.fillText("MARKET:", innerWidth / 2, innerHeight / 2 - 305);
@@ -563,15 +596,15 @@ const drawBoard = function () {
         break;
 
       case menuEnum.PRODUCTION:
-        menuCtx.fillStyle = "black";
-        menuCtx.font = "36px sans-serif";
+        menuCtx.fillStyle = menuTextColor;
+        menuCtx.font = "36px times-new-roman";
         menuCtx.textAlign = "center";
         menuCtx.fillText("PRODUCTION:", innerWidth / 2, innerHeight / 2 - 305);
         break;
 
       case menuEnum.GLOBAL_EVENT:
-        menuCtx.fillStyle = "black";
-        menuCtx.font = "36px sans-serif";
+        menuCtx.fillStyle = menuTextColor;
+        menuCtx.font = "36px times-new-roman";
         menuCtx.textAlign = "center";
         menuCtx.fillText(
           GlobalEvents[globalEvent].name,
@@ -598,8 +631,8 @@ const drawBoard = function () {
         break;
 
       case menuEnum.NATL_EVENT:
-        menuCtx.fillStyle = "black";
-        menuCtx.font = "36px sans-serif";
+        menuCtx.fillStyle = menuTextColor;
+        menuCtx.font = "36px times-new-roman";
         menuCtx.textAlign = "center";
         menuCtx.fillText(
           NatlEvents[natlEvent].name,
@@ -631,11 +664,11 @@ const drawBoard = function () {
     }
 
     // Draws pop up buttons
-    menuCtx.fillStyle = "black";
-    menuCtx.font = "36px sans-serif";
+    menuCtx.fillStyle = menuTextColor;
+    menuCtx.font = "36px times-new-roman";
     menuCtx.textAlign = "center";
     menuCtx.lineWidth = 2;
-    menuCtx.strokeStyle = "black";
+    menuCtx.strokeStyle = menuTextColor;
     if (drawExit) {
       menuCtx.fillText("EXIT", innerWidth / 2, innerHeight / 2 + 200);
       menuCtx.strokeRect(innerWidth / 2 - 50, innerHeight / 2 + 165, 100, 45);
@@ -652,11 +685,11 @@ const drawBoard = function () {
   this.drawCapitalInfo = function () {
     menuCtx.clearRect(0, 0, canvasW, canvasH);
     drawMenu();
-    menuCtx.fillStyle = "grey";
+    menuCtx.fillStyle = bgMenuColor;
     menuCtx.fillRect(innerWidth / 2 - 400, innerHeight / 2 - 100, 800, 200);
 
-    menuCtx.fillStyle = "black";
-    menuCtx.font = "48px sans-serif";
+    menuCtx.fillStyle = menuTextColor;
+    menuCtx.font = "48px times-new-roman";
     menuCtx.textAlign = "center";
     menuCtx.fillText(
       "Select your starting hex on the map:",
@@ -697,9 +730,57 @@ const drawBoard = function () {
    * Draws the top part of the menu where game statistics would be.
    */
   function drawStats() {
+    var rectLeftBound = innerWidth / 2 - 250;
+    var rectRightBound = innerWidth / 2 + 250;
+
     statCtx.clearRect(0, 0, canvasW, canvasH);
-    statCtx.fillStyle = "grey";
-    statCtx.fillRect(0, 0, boardCanvas.width, 35);
+
+    // Draw the main bg rect
+    statCtx.fillStyle = bgMenuColor;
+    statCtx.fillRect(rectLeftBound, 0, 500, 85);
+
+    // Draws the left triangle adjacent to the banner rect
+    statCtx.beginPath();
+    statCtx.moveTo(rectLeftBound, 85);
+    statCtx.lineTo(rectLeftBound - 50, 0);
+    statCtx.lineTo(rectLeftBound, 0);
+    statCtx.closePath();
+    statCtx.fillStyle = bgMenuColor;
+    statCtx.fill();
+
+    // Draws the right triangle adjacent to the banner rect
+    statCtx.beginPath();
+    statCtx.moveTo(rectRightBound, 85);
+    statCtx.lineTo(rectRightBound + 50, 0);
+    statCtx.lineTo(rectRightBound, 0);
+    statCtx.closePath();
+    statCtx.fillStyle = bgMenuColor;
+    statCtx.fill();
+
+    // Draws the outline of the banner
+    statCtx.beginPath();
+    statCtx.moveTo(rectRightBound + 50, 0);
+    statCtx.lineTo(rectRightBound, 85);
+    statCtx.lineTo(rectLeftBound, 85);
+    statCtx.lineTo(rectLeftBound - 50, 0);
+    statCtx.lineWidth = 3;
+    statCtx.strokeStyle = borderColor;
+    statCtx.stroke();
+
+    // Draw the main text
+    statCtx.fillStyle = menuTextColor;
+    statCtx.font = "26px times-new-roman";
+    statCtx.textAlign = "center";
+    statCtx.fillText("I  N  F  L  U  E  N  C  E", innerWidth / 2, 75);
+
+    // Draw the IP total bar outline
+    statCtx.strokeStyle = menuTextColor;
+    statCtx.lineWidth = "1px";
+    statCtx.strokeRect(rectLeftBound + 40, 20, 420, 20);
+
+    // Draw the inside of the IP total bar
+    statCtx.fillStyle = accentBlue;
+    statCtx.fillRect(rectLeftBound + 41, 21, 200, 18);
   }
 
   var testAudio;
