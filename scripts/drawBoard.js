@@ -77,12 +77,18 @@ const menuEnum = Object.freeze({
   PRODUCTION: 4,
   GLOBAL_EVENT: 5,
   NATL_EVENT: 6,
+  MOVEMENT: 7,
 });
 
 /**
  * Stores current menu state
  */
 var menuId = menuEnum.UNCLICKED;
+
+/**
+ * Stores state of expanded categories in the production menu.
+ */
+var prodMenuID = menuEnum.UNCLICKED;
 
 /**
  * Checks if the pop-up is clicked or not
@@ -451,6 +457,11 @@ const drawBoard = function () {
     drawStats();
     drawMenu();
 
+    // Change this to if (a hex is selected) once de-selecting hexes is a thing.
+    if (selectedHex != null) {
+      drawHexStats(hexes[selectedHex]);
+    }
+
     if (menuId != menuEnum.UNCLICKED) {
       drawInfoMenu(menuId);
     }
@@ -600,6 +611,60 @@ const drawBoard = function () {
         menuCtx.font = "36px times-new-roman";
         menuCtx.textAlign = "center";
         menuCtx.fillText("PRODUCTION:", innerWidth / 2, innerHeight / 2 - 305);
+
+        let prodMenuString = "+ ECONOMY";
+        let textY = innerHeight / 2 - 250;
+        menuCtx.font = "26px times-new-roman";
+        menuCtx.textAlign = "left";
+        menuCtx.fillText(prodMenuString, innerWidth / 2 - 228, textY);
+
+        let lineStartX = innerWidth / 2 - 228;
+        let lineEndX = innerWidth / 2 + 228;
+        drawHorizontalLine(lineStartX, lineEndX, textY + 5, menuTextColor, 2);
+        textY += 36;
+
+        if (prodMenuID == menuEnum.ECONOMY) {
+          // Draw expanded production menu
+          textY += 150;
+          drawHorizontalLine(lineStartX, lineEndX, textY + 5, menuTextColor, 2);
+          textY += 36;
+        }
+
+        prodMenuString = "+ MILITARY";
+        menuCtx.fillText(prodMenuString, innerWidth / 2 - 228, textY);
+        drawHorizontalLine(lineStartX, lineEndX, textY + 5, menuTextColor, 2);
+        textY += 36;
+
+        if (prodMenuID == menuEnum.MILITARY) {
+          // Draw expanded production menu
+          textY += 150;
+          drawHorizontalLine(lineStartX, lineEndX, textY + 5, menuTextColor, 2);
+          textY += 36;
+        }
+
+        prodMenuString = "+ MOVEMENT";
+        menuCtx.fillText(prodMenuString, innerWidth / 2 - 228, textY);
+        drawHorizontalLine(lineStartX, lineEndX, textY + 5, menuTextColor, 2);
+        textY += 36;
+
+        if (prodMenuID == menuEnum.MOVEMENT) {
+          // Draw expanded production menu
+          textY += 150;
+          drawHorizontalLine(lineStartX, lineEndX, textY + 5, menuTextColor, 2);
+          textY += 36;
+        }
+
+        prodMenuString = "+ PRODUCTION";
+        menuCtx.fillText(prodMenuString, innerWidth / 2 - 228, textY);
+        drawHorizontalLine(lineStartX, lineEndX, textY + 5, menuTextColor, 2);
+        textY += 36;
+
+        if (prodMenuID == menuEnum.PRODUCTION) {
+          // Draw expanded production menu
+          textY += 150;
+          drawHorizontalLine(lineStartX, lineEndX, textY + 5, menuTextColor, 2);
+          textY += 36;
+        }
         break;
 
       case menuEnum.GLOBAL_EVENT:
@@ -727,6 +792,68 @@ const drawBoard = function () {
   };
 
   /**
+   * Draws bottom-left menu for hex stats.
+   * @param {object} hex - Hex that contains the information to be drawn to the menu.
+   */
+  function drawHexStats(hex) {
+    var hexStatBoxWidth = Math.min(380, innerWidth / 3.5);
+    var hexStatBoxHeight = 170;
+
+    // Draws the background of the menu
+    statCtx.fillStyle = bgMenuColor;
+    statCtx.fillRect(
+      0,
+      innerHeight - hexStatBoxHeight,
+      hexStatBoxWidth,
+      hexStatBoxHeight
+    );
+
+    // Draws the outline of the menu
+    statCtx.beginPath();
+    statCtx.moveTo(0, innerHeight - hexStatBoxHeight);
+    statCtx.lineTo(hexStatBoxWidth, innerHeight - hexStatBoxHeight);
+    statCtx.lineTo(hexStatBoxWidth, innerHeight);
+    statCtx.lineTo(0, innerHeight);
+    statCtx.lineTo(0, innerHeight - hexStatBoxHeight);
+    statCtx.strokeStyle = borderColor;
+    statCtx.lineWidth = 3;
+    statCtx.stroke();
+
+    // Draws the text content of the menu
+    let textY = innerHeight - hexStatBoxHeight + 28;
+    let lineSpacing = 22;
+    statCtx.fillStyle = menuTextColor;
+    statCtx.textAlign = "center";
+    statCtx.font = "22px times-new-roman";
+    statCtx.fillText("SELECTED HEX:", hexStatBoxWidth / 2, textY);
+    textY += 30;
+
+    let textString;
+    statCtx.textAlign = "left";
+    statCtx.font = "18px sans-serif";
+
+    textString = "Units: " + hex.units.length;
+    statCtx.fillText(textString, 5, textY);
+    textY += lineSpacing;
+
+    textString = "Resource given: " + hex.getResource();
+    statCtx.fillText(textString, 5, textY);
+    textY += lineSpacing;
+
+    textString = "Econ score: " + hex.econScore;
+    statCtx.fillText(textString, 5, textY);
+    textY += lineSpacing;
+
+    textString = "Movement score: " + hex.movementScore;
+    statCtx.fillText(textString, 5, textY);
+    textY += lineSpacing;
+
+    textString = "Defensive score (Base): " + hex.defensiveScore;
+    statCtx.fillText(textString, 5, textY);
+    textY += lineSpacing;
+  }
+
+  /**
    * Draws the top part of the menu where game statistics would be.
    */
   function drawStats() {
@@ -741,18 +868,18 @@ const drawBoard = function () {
 
     // Draws the left triangle adjacent to the banner rect
     statCtx.beginPath();
-    statCtx.moveTo(rectLeftBound, 85);
+    statCtx.moveTo(rectLeftBound + 1, 85);
     statCtx.lineTo(rectLeftBound - 50, 0);
-    statCtx.lineTo(rectLeftBound, 0);
+    statCtx.lineTo(rectLeftBound + 1, 0);
     statCtx.closePath();
     statCtx.fillStyle = bgMenuColor;
     statCtx.fill();
 
     // Draws the right triangle adjacent to the banner rect
     statCtx.beginPath();
-    statCtx.moveTo(rectRightBound, 85);
+    statCtx.moveTo(rectRightBound - 1, 85);
     statCtx.lineTo(rectRightBound + 50, 0);
-    statCtx.lineTo(rectRightBound, 0);
+    statCtx.lineTo(rectRightBound - 1, 0);
     statCtx.closePath();
     statCtx.fillStyle = bgMenuColor;
     statCtx.fill();
@@ -781,6 +908,24 @@ const drawBoard = function () {
     // Draw the inside of the IP total bar
     statCtx.fillStyle = accentBlue;
     statCtx.fillRect(rectLeftBound + 41, 21, 200, 18);
+  }
+
+  /**
+   * Draws a horizontal line to the screen.
+   * @param {number} x1 - Starting x coordinate of the line.
+   * @param {number} x2 - Ending x coordinate of the line.
+   * @param {number} y - Y coordinate of the line.
+   * @param {string} color - Color of the line.
+   * @param {number} lineWidth - Width of the line.
+   */
+  function drawHorizontalLine(x1, x2, y, color, lineWidth) {
+    menuCtx.beginPath();
+    menuCtx.moveTo(x1, y);
+    menuCtx.lineTo(x2, y);
+    menuCtx.closePath();
+    menuCtx.strokeStyle = color;
+    menuCtx.lineWidth = lineWidth;
+    menuCtx.stroke();
   }
 
   var testAudio;
@@ -1036,7 +1181,47 @@ const drawBoard = function () {
       mousePosY < innerHeight / 2 + 210
     ) {
       menuId = menuEnum.UNCLICKED;
+      prodMenuID = menuEnum.UNCLICKED;
       drawImgHexes(posXCanvas, posYCanvas);
+    }
+    // Expands production menu
+    else if (
+      menuId == menuEnum.PRODUCTION &&
+      prodMenuID == menuEnum.UNCLICKED
+    ) {
+      if (
+        mousePosX > innerWidth / 2 - 230 &&
+        mousePosX < innerWidth / 2 - 205 &&
+        mousePosY > innerHeight / 2 - 270 &&
+        mousePosY < innerHeight / 2 - 245
+      ) {
+        prodMenuID = menuEnum.ECONOMY;
+        drawInfoMenu(menuEnum.PRODUCTION);
+      } else if (
+        mousePosX > innerWidth / 2 - 230 &&
+        mousePosX < innerWidth / 2 - 205 &&
+        mousePosY > innerHeight / 2 - 234 &&
+        mousePosY < innerHeight / 2 - 209
+      ) {
+        prodMenuID = menuEnum.MILITARY;
+        drawInfoMenu(menuEnum.PRODUCTION);
+      } else if (
+        mousePosX > innerWidth / 2 - 230 &&
+        mousePosX < innerWidth / 2 - 205 &&
+        mousePosY > innerHeight / 2 - 198 &&
+        mousePosY < innerHeight / 2 - 173
+      ) {
+        prodMenuID = menuEnum.MOVEMENT;
+        drawInfoMenu(menuEnum.PRODUCTION);
+      } else if (
+        mousePosX > innerWidth / 2 - 230 &&
+        mousePosX < innerWidth / 2 - 205 &&
+        mousePosY > innerHeight / 2 - 162 &&
+        mousePosY < innerHeight / 2 - 137
+      ) {
+        prodMenuID = menuEnum.PRODUCTION;
+        drawInfoMenu(menuEnum.PRODUCTION);
+      }
     }
     // Hitbox for yes button
     else if (
@@ -1165,6 +1350,8 @@ const drawBoard = function () {
               menuID = menuEnum.UNCLICKED;
               drawImgHexes(posXCanvas, posYCanvas);
             }
+
+            drawHexStats(hexes[selectedHex]);
           }
         }
 
