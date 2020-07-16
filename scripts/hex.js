@@ -79,22 +79,22 @@ function Hex(hexType, originX, originY) {
   // Initializes hex properties based on type
   switch (hexType) {
     case ResourceEnum.IRON:
-      this.resourceGivenString = "ironOre";
+      this.resourceGivenString = "Iron Ore";
       break;
     case ResourceEnum.JEWEL:
-      this.resourceGivenString = "jewels";
+      this.resourceGivenString = "Jewels";
       break;
     case ResourceEnum.LEATHER:
-      this.resourceGivenString = "leather";
+      this.resourceGivenString = "Leather";
       break;
     case ResourceEnum.SPICE:
-      this.resourceGivenString = "spices";
+      this.resourceGivenString = "Spices";
       break;
     case ResourceEnum.STONE:
-      this.resourceGivenString = "stone";
+      this.resourceGivenString = "Stone";
       break;
     case ResourceEnum.WOOD:
-      this.resourceGivenString = "wood";
+      this.resourceGivenString = "Wood";
       break;
     default:
       this.givesResources = false;
@@ -113,7 +113,7 @@ function Hex(hexType, originX, originY) {
     if (this.givesResources) {
       return this.resourceGivenString;
     } else {
-      return null;
+      return "None";
     }
   };
 
