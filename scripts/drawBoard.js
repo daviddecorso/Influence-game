@@ -155,7 +155,8 @@ const drawBoard = function () {
   setCanvasSize();
   setNumHexes(hexWidth, hexHeight);
 
-  var hexesPos = new Array(numHexes * 2);
+  var hexesPos = new Array(numHexes * 3);
+  hexesPos.fill(0);
   var canvasBounds = boardCanvas.getBoundingClientRect();
 
   /**
@@ -614,24 +615,97 @@ const drawBoard = function () {
 
         let prodMenuString = "+ ECONOMY";
         let textY = innerHeight / 2 - 250;
-        menuCtx.font = "26px times-new-roman";
-        menuCtx.textAlign = "left";
-        menuCtx.fillText(prodMenuString, innerWidth / 2 - 228, textY);
-
         let lineStartX = innerWidth / 2 - 228;
         let lineEndX = innerWidth / 2 + 228;
+        menuCtx.font = "26px times-new-roman";
+        menuCtx.textAlign = "left";
+        menuCtx.fillText(prodMenuString, lineStartX, textY);
         drawHorizontalLine(lineStartX, lineEndX, textY + 5, menuTextColor, 2);
-        textY += 36;
+
+        let quantBoxLength;
+        let quantBoxY;
+        let lineDiff;
+        let prodQuants = new Array(numStructures);
+        prodQuants.fill(0);
 
         if (prodMenuID == menuEnum.ECONOMY) {
           // Draw expanded production menu
+          let textYTop = textY;
+          textY += 22;
+          let textX = lineStartX + 60;
+
+          // Draw structure text
+          menuCtx.font = "14px sans-serif";
+          prodMenuString =
+            Structures[1].name.toUpperCase() + " - " + Structures[1].effect;
+          menuCtx.fillText(prodMenuString, textX, textY);
+          // textYTop = textY;
+          textY += 22;
+
+          prodMenuString =
+            "Cost: " +
+            Structures[1].cost +
+            " | Turns: " +
+            Structures[1].time +
+            " | Buff: " +
+            Structures[1].buff;
+          menuCtx.fillText(prodMenuString, textX, textY);
+
+          // Draw number box thing
+          quantBoxLength = 30;
+          quantBoxY;
+          lineDiff = textY - textYTop - 10;
+          quantBoxY = 10 + textYTop + lineDiff / 2 - quantBoxLength / 2;
+
+          menuCtx.strokeStyle = menuTextColor;
+          menuCtx.lineWidth = 1;
+          menuCtx.strokeRect(
+            lineStartX,
+            quantBoxY,
+            quantBoxLength,
+            quantBoxLength
+          );
+
+          menuCtx.font = "24px sans-serif";
+          menuCtx.fillText(
+            prodQuants[0],
+            lineStartX + 8,
+            quantBoxY + 5 + lineDiff / 2
+          );
+
+          // Draw increment button
+          menuCtx.beginPath();
+          menuCtx.moveTo(lineStartX + 35, 8 + textYTop + lineDiff / 2);
+          menuCtx.lineTo(lineStartX + 44, 12 + textYTop);
+          menuCtx.lineTo(lineStartX + 53, 8 + textYTop + lineDiff / 2);
+          menuCtx.lineTo(lineStartX + 35, 8 + textYTop + lineDiff / 2);
+          menuCtx.fillStyle = menuTextColor;
+          menuCtx.fill();
+
+          // Draw decrement button
+          menuCtx.beginPath();
+          menuCtx.moveTo(lineStartX + 35, 12 + textYTop + lineDiff / 2);
+          menuCtx.lineTo(lineStartX + 53, 12 + textYTop + lineDiff / 2);
+          menuCtx.lineTo(lineStartX + 44, textY - 2);
+          menuCtx.moveTo(lineStartX + 35, 12 + textYTop + lineDiff / 2);
+          menuCtx.fillStyle = menuTextColor;
+          menuCtx.fill();
+
+          // Draw horizontal line between items
+          drawHorizontalLine(lineStartX, lineEndX, textY + 5, menuTextColor, 1);
+          textY += 22;
+
+          // MAKE THIS INTO A FOR LOOP WHERE ALL OF THE STRUCTURES FROM A CERTAIN CATEGORY PRINT LIKE THIS.
+
+          // Draw horizontal line between categories
           textY += 150;
           drawHorizontalLine(lineStartX, lineEndX, textY + 5, menuTextColor, 2);
-          textY += 36;
         }
 
+        textY += 36;
         prodMenuString = "+ MILITARY";
-        menuCtx.fillText(prodMenuString, innerWidth / 2 - 228, textY);
+        menuCtx.font = "26px times-new-roman";
+        menuCtx.fillText(prodMenuString, lineStartX, textY);
         drawHorizontalLine(lineStartX, lineEndX, textY + 5, menuTextColor, 2);
         textY += 36;
 
@@ -643,7 +717,8 @@ const drawBoard = function () {
         }
 
         prodMenuString = "+ MOVEMENT";
-        menuCtx.fillText(prodMenuString, innerWidth / 2 - 228, textY);
+        menuCtx.font = "26px times-new-roman";
+        menuCtx.fillText(prodMenuString, lineStartX, textY);
         drawHorizontalLine(lineStartX, lineEndX, textY + 5, menuTextColor, 2);
         textY += 36;
 
@@ -655,7 +730,8 @@ const drawBoard = function () {
         }
 
         prodMenuString = "+ PRODUCTION";
-        menuCtx.fillText(prodMenuString, innerWidth / 2 - 228, textY);
+        menuCtx.font = "26px times-new-roman";
+        menuCtx.fillText(prodMenuString, lineStartX, textY);
         drawHorizontalLine(lineStartX, lineEndX, textY + 5, menuTextColor, 2);
         textY += 36;
 

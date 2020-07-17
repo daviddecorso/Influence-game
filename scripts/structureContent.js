@@ -38,8 +38,10 @@ Structures = [
   },
   {
     name: "Road",
-    effect: "1/2 movement cost.",
+    effect: "Halves the movement cost for a given hex.",
+    buff: "1/2 movement cost.",
     type: structureTypeEnum.MOVEMENT,
+    cost: 10,
     time: 2,
     modifierType: structureModifierEnum.scaleMovementCost,
     modifier: 0.5,
