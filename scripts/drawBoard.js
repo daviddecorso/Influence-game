@@ -1,5 +1,5 @@
 /**
- * Number of hexes to be draen
+ * Number of hexes to be drawn
  * (I don't think this is used.)
  */
 var numHexes;
@@ -495,12 +495,117 @@ const drawBoard = function () {
     menuCtx.drawImage(menuImgArray[3], innerWidth / 2 + 80, innerHeight - 85);
   }
 
+  /**
+   * Draws the the text for structures to the production menu.
+   * @param {number} lineStartX
+   * @param {number} lineEndX
+   * @param {object} structure
+   * @param {object} prodQuants
+   * @param {number} structureType
+   */
+  function drawMenuStructureText(
+    lineStartX,
+    lineEndX,
+    structures,
+    prodQuants,
+    structureType
+  ) {
+    // Draw expanded production menu
+    let textYTop = textY;
+    textY += 22;
+    let textX = lineStartX + 60;
+
+    structures.forEach((structure) => {
+      if (structure.type == structureType) {
+        // Draw structure text
+        menuCtx.font = "14px sans-serif";
+        const { name, effect, cost, time, buff } = structure;
+
+        prodMenuString = `${name.toUpperCase()} - ${effect}`;
+
+        menuCtx.fillText(prodMenuString, textX, textY);
+        // textYTop = textY;
+        textY += 22;
+
+        prodMenuString = `Cost: ${cost} | Turns: ${time} | Buff: ${buff}`;
+
+        menuCtx.fillText(prodMenuString, textX, textY);
+
+        // Draw number box thing
+        quantBoxLength = 30;
+        lineDiff = textY - textYTop - 10;
+        quantBoxY = 10 + textYTop + lineDiff / 2 - quantBoxLength / 2;
+        menuCtx.strokeStyle = menuTextColor;
+        menuCtx.lineWidth = 1;
+        menuCtx.strokeRect(
+          lineStartX,
+          quantBoxY,
+          quantBoxLength,
+          quantBoxLength
+        );
+
+        // Draws quantity of production items to be built
+        menuCtx.font = "24px sans-serif";
+        menuCtx.fillText(
+          prodQuants[0],
+          lineStartX + 8,
+          quantBoxY + 5 + lineDiff / 2
+        );
+
+        // Draw increment button
+        menuCtx.beginPath();
+        menuCtx.moveTo(lineStartX + 35, 8 + textYTop + lineDiff / 2);
+        menuCtx.lineTo(lineStartX + 44, 12 + textYTop);
+        menuCtx.lineTo(lineStartX + 53, 8 + textYTop + lineDiff / 2);
+        menuCtx.lineTo(lineStartX + 35, 8 + textYTop + lineDiff / 2);
+        menuCtx.fillStyle = menuTextColor;
+        menuCtx.fill();
+
+        // Draw decrement button
+        menuCtx.beginPath();
+        menuCtx.moveTo(lineStartX + 35, 12 + textYTop + lineDiff / 2);
+        menuCtx.lineTo(lineStartX + 53, 12 + textYTop + lineDiff / 2);
+        menuCtx.lineTo(lineStartX + 44, textY - 2);
+        menuCtx.moveTo(lineStartX + 35, 12 + textYTop + lineDiff / 2);
+        menuCtx.fillStyle = menuTextColor;
+        menuCtx.fill();
+
+        // Draw horizontal line between items
+        drawHorizontalLine(lineStartX, lineEndX, textY + 5, menuTextColor, 1);
+        textYTop = textY;
+        textY += 22;
+
+        numStructuresDrawn++;
+      }
+    });
+
+    if (numStructuresDrawn == 0) {
+      menuCtx.font = "20px sans-serif";
+      menuCtx.fillText(
+        "No structures of this type can be built here.",
+        lineStartX + 25,
+        textY - 24
+      );
+    }
+
+    textY = textYTop;
+
+    // Draw horizontal line between categories
+    drawHorizontalLine(lineStartX, lineEndX, textYTop + 5, menuTextColor, 2);
+  }
+
   let drawExit = true;
+  let numStructuresDrawn = 0;
+  /**
+   * Sets the starting text height for the info menu.
+   */
+  let textY = innerHeight / 2 - 250;
   /**
    * Draws the menus that pop up in the middle of the screen (military, production, economy, etc.)
    * @param {number} menuType - Type of the menu to be drawn.
    */
   this.drawInfoMenu = function (menuType) {
+    numStructuresDrawn = 0;
     drawExit = true;
     menuCtx.clearRect;
 
@@ -614,7 +719,7 @@ const drawBoard = function () {
         menuCtx.fillText("PRODUCTION:", innerWidth / 2, innerHeight / 2 - 305);
 
         let prodMenuString = "+ ECONOMY";
-        let textY = innerHeight / 2 - 250;
+        textY = innerHeight / 2 - 250;
         let lineStartX = innerWidth / 2 - 228;
         let lineEndX = innerWidth / 2 + 228;
         menuCtx.font = "26px times-new-roman";
@@ -629,77 +734,13 @@ const drawBoard = function () {
         prodQuants.fill(0);
 
         if (prodMenuID == menuEnum.ECONOMY) {
-          // Draw expanded production menu
-          let textYTop = textY;
-          textY += 22;
-          let textX = lineStartX + 60;
-
-          // Draw structure text
-          menuCtx.font = "14px sans-serif";
-          prodMenuString =
-            Structures[1].name.toUpperCase() + " - " + Structures[1].effect;
-          menuCtx.fillText(prodMenuString, textX, textY);
-          // textYTop = textY;
-          textY += 22;
-
-          prodMenuString =
-            "Cost: " +
-            Structures[1].cost +
-            " | Turns: " +
-            Structures[1].time +
-            " | Buff: " +
-            Structures[1].buff;
-          menuCtx.fillText(prodMenuString, textX, textY);
-
-          // Draw number box thing
-          quantBoxLength = 30;
-          quantBoxY;
-          lineDiff = textY - textYTop - 10;
-          quantBoxY = 10 + textYTop + lineDiff / 2 - quantBoxLength / 2;
-
-          menuCtx.strokeStyle = menuTextColor;
-          menuCtx.lineWidth = 1;
-          menuCtx.strokeRect(
+          drawMenuStructureText(
             lineStartX,
-            quantBoxY,
-            quantBoxLength,
-            quantBoxLength
+            lineEndX,
+            Structures,
+            prodQuants,
+            structureTypeEnum.ECONOMY
           );
-
-          menuCtx.font = "24px sans-serif";
-          menuCtx.fillText(
-            prodQuants[0],
-            lineStartX + 8,
-            quantBoxY + 5 + lineDiff / 2
-          );
-
-          // Draw increment button
-          menuCtx.beginPath();
-          menuCtx.moveTo(lineStartX + 35, 8 + textYTop + lineDiff / 2);
-          menuCtx.lineTo(lineStartX + 44, 12 + textYTop);
-          menuCtx.lineTo(lineStartX + 53, 8 + textYTop + lineDiff / 2);
-          menuCtx.lineTo(lineStartX + 35, 8 + textYTop + lineDiff / 2);
-          menuCtx.fillStyle = menuTextColor;
-          menuCtx.fill();
-
-          // Draw decrement button
-          menuCtx.beginPath();
-          menuCtx.moveTo(lineStartX + 35, 12 + textYTop + lineDiff / 2);
-          menuCtx.lineTo(lineStartX + 53, 12 + textYTop + lineDiff / 2);
-          menuCtx.lineTo(lineStartX + 44, textY - 2);
-          menuCtx.moveTo(lineStartX + 35, 12 + textYTop + lineDiff / 2);
-          menuCtx.fillStyle = menuTextColor;
-          menuCtx.fill();
-
-          // Draw horizontal line between items
-          drawHorizontalLine(lineStartX, lineEndX, textY + 5, menuTextColor, 1);
-          textY += 22;
-
-          // MAKE THIS INTO A FOR LOOP WHERE ALL OF THE STRUCTURES FROM A CERTAIN CATEGORY PRINT LIKE THIS.
-
-          // Draw horizontal line between categories
-          textY += 150;
-          drawHorizontalLine(lineStartX, lineEndX, textY + 5, menuTextColor, 2);
         }
 
         textY += 36;
@@ -711,8 +752,13 @@ const drawBoard = function () {
 
         if (prodMenuID == menuEnum.MILITARY) {
           // Draw expanded production menu
-          textY += 150;
-          drawHorizontalLine(lineStartX, lineEndX, textY + 5, menuTextColor, 2);
+          drawMenuStructureText(
+            lineStartX,
+            lineEndX,
+            Structures,
+            prodQuants,
+            structureTypeEnum.MILITARY
+          );
           textY += 36;
         }
 
@@ -723,9 +769,17 @@ const drawBoard = function () {
         textY += 36;
 
         if (prodMenuID == menuEnum.MOVEMENT) {
+          // Shouldn't need this here, pls fix.
+          textY -= 36;
+
           // Draw expanded production menu
-          textY += 150;
-          drawHorizontalLine(lineStartX, lineEndX, textY + 5, menuTextColor, 2);
+          drawMenuStructureText(
+            lineStartX,
+            lineEndX,
+            Structures,
+            prodQuants,
+            structureTypeEnum.MOVEMENT
+          );
           textY += 36;
         }
 
@@ -736,9 +790,17 @@ const drawBoard = function () {
         textY += 36;
 
         if (prodMenuID == menuEnum.PRODUCTION) {
+          // Shouldn't need this here, pls fix.
+          textY -= 36;
+
           // Draw expanded production menu
-          textY += 150;
-          drawHorizontalLine(lineStartX, lineEndX, textY + 5, menuTextColor, 2);
+          drawMenuStructureText(
+            lineStartX,
+            lineEndX,
+            Structures,
+            prodQuants,
+            structureTypeEnum.PRODUCTION
+          );
           textY += 36;
         }
         break;
